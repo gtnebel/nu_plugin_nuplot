@@ -18,7 +18,7 @@ func NuplotLine() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{
 			Name:        "nuplot line",
-			Category:    "chart",
+			Category:    "Chart",
 			Desc:        `Plots the data that is piped into the command as 'echarts' graph.`,
 			SearchTerms: []string{"plot", "graph", "line", "bar"},
 			InputOutputTypes: []nu.InOutTypes{
@@ -53,6 +53,16 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 		case []float64:
 			for _, val := range data {
 				items = append(items, opts.LineData{Value: val})
+			}
+		case []nu.Value:
+			for _, val := range data {
+				items = append(items, opts.LineData{Value: val.Value})
+				// switch v := val.Value.(type) {
+				// case int64:
+				// 	items = append(items, opts.LineData{Value: v})
+				// case float64:
+				// 	items = append(items, opts.LineData{Value: v})
+				// }
 			}
 		default:
 			return fmt.Errorf("unsupported input value type %T", data)
@@ -94,7 +104,7 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 		// }
 		// return call.ReturnValue(ctx, rv)
 	case <-chan nu.Value:
-		return fmt.Errorf("unsupported input type %T", call.Input)
+		return fmt.Errorf("unsupported input type: <-chan %T", call.Input)
 
 	case io.Reader:
 		// decoder wants io.ReadSeeker so we need to read to buf.
@@ -113,7 +123,7 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 		// 	return fmt.Errorf("converting to Value: %w", err)
 		// }
 		// return call.ReturnValue(ctx, rv)
-		return fmt.Errorf("unsupported input type %T", call.Input)
+		return fmt.Errorf("unsupported input type: io.Reader %T", call.Input)
 	default:
 		return fmt.Errorf("unsupported input type %T", call.Input)
 	}

@@ -15,7 +15,7 @@ import (
 	// "github.com/go-echarts/go-echarts/v2/opts"
 	// "github.com/go-echarts/go-echarts/v2/types"
 
-	"nuplot/commands"
+	"github.com/gtnebel/nu_plugin_nuplot/commands"
 )
 
 const PluginVersion = "0.0.1"
