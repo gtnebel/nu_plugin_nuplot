@@ -14,6 +14,23 @@ import (
 	"github.com/ainvaltin/nu-plugin/types"
 )
 
+type LineData = []opts.LineData
+
+type LineDataSeries = map[string]LineData
+
+const DefaultSeries = "Items"
+
+func getSeries(series LineDataSeries, name string) LineData {
+	s, ok := series[name]
+
+	if ok {
+		return s
+	} else {
+		series[name] = make(LineData, 0)
+		return series[name]
+	}
+}
+
 func NuplotLine() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{
@@ -43,69 +60,15 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 	case nil:
 		return nil
 	case nu.Value:
-		items := make([]opts.LineData, 0)
-
-		switch data := in.Value.(type) {
-		case []int64:
-			for _, val := range data {
-				items = append(items, opts.LineData{Value: val})
-			}
-		case []float64:
-			for _, val := range data {
-				items = append(items, opts.LineData{Value: val})
-			}
-		case []nu.Value:
-			for _, val := range data {
-				items = append(items, opts.LineData{Value: val.Value})
-				// switch v := val.Value.(type) {
-				// case int64:
-				// 	items = append(items, opts.LineData{Value: v})
-				// case float64:
-				// 	items = append(items, opts.LineData{Value: v})
-				// }
-			}
-		default:
-			return fmt.Errorf("unsupported input value type %T", data)
-		}
-
-		// create a new line instance
-		line := charts.NewLine()
-		// set some global options like Title/Legend/ToolTip or anything else
-		line.SetGlobalOptions(
-			charts.WithInitializationOpts(opts.Initialization{Theme: charttypes.ThemeWesteros}),
-			charts.WithTitleOpts(opts.Title{
-				Title:    "Line example in Westeros theme",
-				Subtitle: "Line chart rendered by the http server this time",
-			}))
-
-		xRange := make([]int, len(items))
-		for i := range len(items) {
-			xRange[i] = i
-		}
-
-		// Put data into instance
-		line.SetXAxis(xRange).
-			AddSeries("Items", items).
-			SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
-
-		f1, _ := os.Create("line.html")
-		line.Render(f1)
-
-		// If the call returns nothing, we can return nil here.
-		return nil
-
-		// var v any
-		// if _, err := plist.Unmarshal(buf, &v); err != nil {
-		// 	return fmt.Errorf("decoding input as plist: %w", err)
-		// }
-		// rv, err := asValue(v)
-		// if err != nil {
-		// 	return fmt.Errorf("converting to Value: %w", err)
-		// }
-		// return call.ReturnValue(ctx, rv)
+		return plotLine(in.Value)
 	case <-chan nu.Value:
-		return fmt.Errorf("unsupported input type: <-chan %T", call.Input)
+		inValues := make([]nu.Value, 0)
 
+		for v := range in {
+			inValues = append(inValues, v)
+		}
+
+		return plotLine(inValues)
 	case io.Reader:
 		// decoder wants io.ReadSeeker so we need to read to buf.
 		// could read just enough that the decoder can detect the
@@ -123,33 +86,66 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 		// 	return fmt.Errorf("converting to Value: %w", err)
 		// }
 		// return call.ReturnValue(ctx, rv)
-		return fmt.Errorf("unsupported input type: io.Reader %T", call.Input)
+		return fmt.Errorf("1 unsupported input type: %T", call.Input)
 	default:
-		return fmt.Errorf("unsupported input type %T", call.Input)
+		return fmt.Errorf("2 unsupported input type: %T", call.Input)
 	}
 }
 
-func asValue(v any) (_ nu.Value, err error) {
-	switch in := v.(type) {
-	case uint64, float64, bool, string, []byte:
-		return nu.Value{Value: in}, nil
-	case []any:
-		lst := make([]nu.Value, len(in))
-		for i := 0; i < len(in); i++ {
-			if lst[i], err = asValue(in[i]); err != nil {
-				return nu.Value{}, err
+func plotLine(input any) error {
+	series := make(LineDataSeries)
+	// items := make([]opts.LineData, 0)
+
+	switch inputValue := input.(type) {
+	case []nu.Value:
+		for _, item := range inputValue {
+			switch itemValue := item.Value.(type) {
+			case int64:
+				items := getSeries(series, DefaultSeries)
+				series[DefaultSeries] = append(items, opts.LineData{Value: itemValue})
+			case float64:
+				items := getSeries(series, DefaultSeries)
+				series[DefaultSeries] = append(items, opts.LineData{Value: itemValue})
+			case nu.Record:
+				for k, v := range itemValue {
+					items := getSeries(series, k)
+					series[k] = append(items, opts.LineData{Value: v.Value})
+				}
+			default:
+				return fmt.Errorf("3 unsupported input value type: %T", inputValue)
 			}
 		}
-		return nu.Value{Value: lst}, nil
-	case map[string]any:
-		rec := nu.Record{}
-		for k, v := range in {
-			if rec[k], err = asValue(v); err != nil {
-				return nu.Value{}, err
-			}
-		}
-		return nu.Value{Value: rec}, nil
 	default:
-		return nu.Value{}, fmt.Errorf("unsupported value type %T", in)
+		return fmt.Errorf("4 unsupported input value type: %T", inputValue)
 	}
+
+	// create a new line instance
+	line := charts.NewLine()
+	// set some global options like Title/Legend/ToolTip or anything else
+	line.SetGlobalOptions(
+		charts.WithInitializationOpts(opts.Initialization{Theme: charttypes.ThemeWesteros}),
+		charts.WithTitleOpts(opts.Title{
+			Title:    "Line example in Westeros theme",
+			Subtitle: "Line chart rendered by the http server this time",
+		}))
+
+	// Put data into instance
+	itemCount := 0
+	for sName, sValues := range series {
+		itemCount = len(sValues)
+		line = line.AddSeries(sName, sValues)
+	}
+
+	xRange := make([]int, itemCount)
+	for i := range itemCount {
+		xRange[i] = i
+	}
+
+	line.SetXAxis(xRange).
+		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
+
+	f1, _ := os.Create("line.html")
+	line.Render(f1)
+
+	return nil
 }

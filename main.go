@@ -4,16 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	// "math/rand"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/ainvaltin/nu-plugin"
-
-	// "github.com/go-echarts/go-echarts/v2/charts"
-	// "github.com/go-echarts/go-echarts/v2/opts"
-	// "github.com/go-echarts/go-echarts/v2/types"
 
 	"github.com/gtnebel/nu_plugin_nuplot/commands"
 )
@@ -33,15 +28,6 @@ func quitSignalContext() context.Context {
 
 	return ctx
 }
-
-// // generate random data for line chart
-// func generateLineItems() []opts.LineData {
-// 	items := make([]opts.LineData, 0)
-// 	for range 7 {
-// 		items = append(items, opts.LineData{Value: rand.Intn(300)})
-// 	}
-// 	return items
-// }
 
 // // generate random data for bar chart
 // func generateBarItems() []opts.BarData {
@@ -83,23 +69,4 @@ func main() {
 	// // Where the magic happens
 	// f, _ := os.Create("bar.html")
 	// bar.Render(f)
-
-	// // create a new line instance
-	// line := charts.NewLine()
-	// // set some global options like Title/Legend/ToolTip or anything else
-	// line.SetGlobalOptions(
-	// 	charts.WithInitializationOpts(opts.Initialization{Theme: types.ThemeWesteros}),
-	// 	charts.WithTitleOpts(opts.Title{
-	// 		Title:    "Line example in Westeros theme",
-	// 		Subtitle: "Line chart rendered by the http server this time",
-	// 	}))
-
-	// // Put data into instance
-	// line.SetXAxis([]string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}).
-	// 	AddSeries("Category A", generateLineItems()).
-	// 	AddSeries("Category B", generateLineItems()).
-	// 	SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
-
-	// f1, _ := os.Create("line.html")
-	// line.Render(f1)
 }
