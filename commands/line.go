@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/pkg/browser"
@@ -13,6 +14,7 @@ import (
 	charttypes "github.com/go-echarts/go-echarts/v2/types"
 
 	"github.com/ainvaltin/nu-plugin"
+	"github.com/ainvaltin/nu-plugin/syntaxshape"
 	"github.com/ainvaltin/nu-plugin/types"
 )
 
@@ -39,7 +41,20 @@ func NuplotLine() *nu.Command {
 			Name:        "nuplot line",
 			Category:    "Chart",
 			Desc:        `Plots the data that is piped into the command as 'echarts' graph.`,
+			Description: "TODO: Long description....",
 			SearchTerms: []string{"plot", "graph", "line", "bar"},
+			// OptionalPositional: nu.PositionalArgs{},
+			Named: nu.Flags{
+				nu.Flag{
+					Long:     "title",
+					Short:    "t",
+					Shape:    syntaxshape.String(),
+					Required: false,
+					Desc:     "The chart title",
+					VarId:    0,
+					Default:  &nu.Value{Value: "Line chart"},
+				},
+			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
 				{In: types.List(types.Number()), Out: types.Nothing()},
@@ -60,18 +75,22 @@ func NuplotLine() *nu.Command {
 func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 	switch in := call.Input.(type) {
 	case nil:
+		log.Println("nuplotLineHandler:", "Input is nil")
 		return nil
 	case nu.Value:
-		return plotLine(in.Value)
+		log.Println("nuplotLineHandler:", "Input is nu.Value")
+		return plotLine(in.Value, call)
 	case <-chan nu.Value:
+		log.Println("nuplotLineHandler:", "Input is <-chan nu.Value")
 		inValues := make([]nu.Value, 0)
 
 		for v := range in {
 			inValues = append(inValues, v)
 		}
 
-		return plotLine(inValues)
+		return plotLine(inValues, call)
 	case io.Reader:
+		log.Println("nuplotLineHandler:", "Input is io.Reader")
 		// decoder wants io.ReadSeeker so we need to read to buf.
 		// could read just enough that the decoder can detect the
 		// format and stream the rest?
@@ -94,9 +113,8 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 	}
 }
 
-func plotLine(input any) error {
+func plotLine(input any, call *nu.ExecCommand) error {
 	series := make(LineDataSeries)
-	// items := make([]opts.LineData, 0)
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
@@ -124,17 +142,20 @@ func plotLine(input any) error {
 	// create a new line instance
 	line := charts.NewLine()
 	// set some global options like Title/Legend/ToolTip or anything else
+	title, _ := call.FlagValue("title")
+	log.Println("plotLine:", "title: ", title.Value.(string))
 	line.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{Theme: charttypes.ThemeWesteros}),
 		charts.WithTitleOpts(opts.Title{
-			Title:    "Line example in Westeros theme",
-			Subtitle: "Line chart rendered by the http server this time",
+			Title:    title.Value.(string),
+			Subtitle: "This chart was rendered by nuplot",
 		}))
 
 	// Put data into instance
 	itemCount := 0
 	for sName, sValues := range series {
 		itemCount = len(sValues)
+		log.Println("plotLine:", "Adding", itemCount, "items to series", sName, ":", sValues)
 		line = line.AddSeries(sName, sValues)
 	}
 
@@ -148,6 +169,8 @@ func plotLine(input any) error {
 
 	chartFile, _ := os.CreateTemp("", "chart-*.html")
 	chartFileName := chartFile.Name()
+	log.Println("plotLine:", "Rendering output to", chartFileName)
+	line.Render(chartFile)
 	chartFile.Close()
 
 	browser.OpenFile(chartFileName)
