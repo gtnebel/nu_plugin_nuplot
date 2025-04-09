@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/pkg/browser"
+
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	charttypes "github.com/go-echarts/go-echarts/v2/types"
@@ -144,8 +146,11 @@ func plotLine(input any) error {
 	line.SetXAxis(xRange).
 		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
 
-	f1, _ := os.Create("line.html")
-	line.Render(f1)
+	chartFile, _ := os.CreateTemp("", "chart-*.html")
+	chartFileName := chartFile.Name()
+	chartFile.Close()
+
+	browser.OpenFile(chartFileName)
 
 	return nil
 }
