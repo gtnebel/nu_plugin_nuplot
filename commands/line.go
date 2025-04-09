@@ -54,6 +54,15 @@ func NuplotLine() *nu.Command {
 					VarId:    0,
 					Default:  &nu.Value{Value: "Line chart"},
 				},
+				nu.Flag{
+					Long:     "subtitle",
+					Short:    "s",
+					Shape:    syntaxshape.String(),
+					Required: false,
+					Desc:     "The chart subtitle",
+					VarId:    0,
+					Default:  &nu.Value{Value: "This chart was rendered by nuplot"},
+				},
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
@@ -143,12 +152,14 @@ func plotLine(input any, call *nu.ExecCommand) error {
 	line := charts.NewLine()
 	// set some global options like Title/Legend/ToolTip or anything else
 	title, _ := call.FlagValue("title")
+	subtitle, _ := call.FlagValue("subtitle")
 	log.Println("plotLine:", "title: ", title.Value.(string))
+	log.Println("plotLine:", "subtitle: ", subtitle.Value.(string))
 	line.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{Theme: charttypes.ThemeWesteros}),
 		charts.WithTitleOpts(opts.Title{
 			Title:    title.Value.(string),
-			Subtitle: "This chart was rendered by nuplot",
+			Subtitle: subtitle.Value.(string),
 		}))
 
 	// Put data into instance
