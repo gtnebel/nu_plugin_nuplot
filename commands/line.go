@@ -137,8 +137,12 @@ func plotLine(input any, call *nu.ExecCommand) error {
 				series[DefaultSeries] = append(items, opts.LineData{Value: itemValue})
 			case nu.Record:
 				for k, v := range itemValue {
-					items := getSeries(series, k)
-					series[k] = append(items, opts.LineData{Value: v.Value})
+					_, ok1 := v.Value.(int64)
+					_, ok2 := v.Value.(float64)
+					if ok1 || ok2 {
+						items := getSeries(series, k)
+						series[k] = append(items, opts.LineData{Value: v.Value})
+					}
 				}
 			default:
 				return fmt.Errorf("3 unsupported input value type: %T", inputValue)
@@ -160,13 +164,17 @@ func plotLine(input any, call *nu.ExecCommand) error {
 		charts.WithTitleOpts(opts.Title{
 			Title:    title.Value.(string),
 			Subtitle: subtitle.Value.(string),
-		}))
+		}),
+		charts.WithDataZoomOpts(opts.DataZoom{
+			Type: "slider",
+		}),
+	)
 
 	// Put data into instance
 	itemCount := 0
 	for sName, sValues := range series {
 		itemCount = len(sValues)
-		log.Println("plotLine:", "Adding", itemCount, "items to series", sName, ":", sValues)
+		log.Println("plotLine:", "Adding", itemCount, "items to series", sName)
 		line = line.AddSeries(sName, sValues)
 	}
 
