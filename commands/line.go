@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/pkg/browser"
 
@@ -23,6 +25,7 @@ type LineData = []opts.LineData
 type LineDataSeries = map[string]LineData
 
 const DefaultSeries = "Items"
+const XAxisSeries = "__x_axis__"
 
 func getSeries(series LineDataSeries, name string) LineData {
 	s, ok := series[name]
@@ -32,6 +35,31 @@ func getSeries(series LineDataSeries, name string) LineData {
 	} else {
 		series[name] = make(LineData, 0)
 		return series[name]
+	}
+}
+
+func matchXValue(nuValue nu.Value) opts.LineData {
+	const IsoDate = "2006-01-02 15:04:05 -07:00"
+
+	switch value := nuValue.Value.(type) {
+	case string:
+		if date, err := time.Parse(time.RFC3339, value); err == nil {
+			// log.Println("matchXValue:", "Value is RFC3339 date string")
+			return opts.LineData{Value: date}
+		}
+		if date, err := time.Parse(IsoDate, value); err == nil {
+			// log.Println("matchXValue:", "Value is ISO date string")
+			return opts.LineData{Value: date}
+		}
+		if number, err := strconv.ParseFloat(value, 64); err == nil {
+			// log.Println("matchXValue:", "Value is number string")
+			return opts.LineData{Value: number}
+		}
+
+		log.Println("matchXValue:", "Value is unknown string:", value)
+		return opts.LineData{Value: value}
+	default:
+		return opts.LineData{Value: value}
 	}
 }
 
@@ -62,6 +90,15 @@ func NuplotLine() *nu.Command {
 					Desc:     "The chart subtitle",
 					VarId:    0,
 					Default:  &nu.Value{Value: "This chart was rendered by nuplot"},
+				},
+				nu.Flag{
+					Long:     "xaxis",
+					Short:    "x",
+					Shape:    syntaxshape.String(), // TODO: CellPath not supported...
+					Required: false,
+					Desc:     "Only if input is a table: the column name wich holds the values for the x-axis",
+					VarId:    0,
+					// Default:  nil,
 				},
 			},
 			InputOutputTypes: []nu.InOutTypes{
@@ -125,6 +162,9 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 func plotLine(input any, call *nu.ExecCommand) error {
 	series := make(LineDataSeries)
 
+	xAxis, xAxisOk := call.FlagValue("xaxis")
+	log.Println("plotLine:", "xAxis:", xAxisOk, xAxis)
+
 	switch inputValue := input.(type) {
 	case []nu.Value:
 		for _, item := range inputValue {
@@ -142,6 +182,14 @@ func plotLine(input any, call *nu.ExecCommand) error {
 					if ok1 || ok2 {
 						items := getSeries(series, k)
 						series[k] = append(items, opts.LineData{Value: v.Value})
+					}
+				}
+
+				// If a xaxis is defined, fill the series with the values.
+				if xAxisOk {
+					if v, ok := itemValue[xAxis.Value.(string)]; ok {
+						items := getSeries(series, XAxisSeries)
+						series[XAxisSeries] = append(items, matchXValue(v))
 					}
 				}
 			default:
@@ -173,18 +221,27 @@ func plotLine(input any, call *nu.ExecCommand) error {
 	// Put data into instance
 	itemCount := 0
 	for sName, sValues := range series {
+		if sName == XAxisSeries {
+			continue
+		}
+
 		itemCount = len(sValues)
 		log.Println("plotLine:", "Adding", itemCount, "items to series", sName)
 		line = line.AddSeries(sName, sValues)
 	}
 
-	xRange := make([]int, itemCount)
-	for i := range itemCount {
-		xRange[i] = i
+	if xAxisOk {
+		line = line.SetXAxis(series[XAxisSeries])
+	} else {
+		xRange := make([]int, itemCount)
+		for i := range itemCount {
+			xRange[i] = i
+		}
+
+		line = line.SetXAxis(xRange)
 	}
 
-	line.SetXAxis(xRange).
-		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
+	line.SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
 
 	chartFile, _ := os.CreateTemp("", "chart-*.html")
 	chartFileName := chartFile.Name()
