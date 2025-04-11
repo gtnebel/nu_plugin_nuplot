@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 
@@ -26,6 +27,11 @@ type LineDataSeries = map[string]LineData
 
 const DefaultSeries = "Items"
 const XAxisSeries = "__x_axis__"
+
+var Themes = []string{
+	"chalk", "essos", "infographic", "macarons", "purple-passion", "roma",
+	"romantic", "shine", "vintage", "walden", "westeros", "wonderland",
+}
 
 func getSeries(series LineDataSeries, name string) LineData {
 	s, ok := series[name]
@@ -100,6 +106,15 @@ func NuplotLine() *nu.Command {
 					VarId:    0,
 					// Default:  nil,
 				},
+				nu.Flag{
+					Long:     "color-theme",
+					Short:    "c",
+					Shape:    syntaxshape.String(),
+					Required: false,
+					Desc:     "One of: chalk, essos, infographic, macarons, purple-passion, roma, romantic, shine, vintage, walden, westeros, wonderland,",
+					VarId:    0,
+					Default:  &nu.Value{Value: "westeros"},
+				},
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
@@ -163,6 +178,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 	series := make(LineDataSeries)
 
 	xAxis, xAxisOk := call.FlagValue("xaxis")
+	xAxisName := xAxis.Value.(string)
 	log.Println("plotLine:", "xAxis:", xAxisOk, xAxis)
 
 	switch inputValue := input.(type) {
@@ -177,6 +193,10 @@ func plotLine(input any, call *nu.ExecCommand) error {
 				series[DefaultSeries] = append(items, opts.LineData{Value: itemValue})
 			case nu.Record:
 				for k, v := range itemValue {
+					if k == xAxisName {
+						continue
+					}
+
 					_, ok1 := v.Value.(int64)
 					_, ok2 := v.Value.(float64)
 					if ok1 || ok2 {
@@ -187,7 +207,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 
 				// If a xaxis is defined, fill the series with the values.
 				if xAxisOk {
-					if v, ok := itemValue[xAxis.Value.(string)]; ok {
+					if v, ok := itemValue[xAxisName]; ok {
 						items := getSeries(series, XAxisSeries)
 						series[XAxisSeries] = append(items, matchXValue(v))
 					} else {
@@ -210,18 +230,52 @@ func plotLine(input any, call *nu.ExecCommand) error {
 	// set some global options like Title/Legend/ToolTip or anything else
 	title, _ := call.FlagValue("title")
 	subtitle, _ := call.FlagValue("subtitle")
+	colorTheme, _ := call.FlagValue("color-theme")
 	log.Println("plotLine:", "title: ", title.Value.(string))
 	log.Println("plotLine:", "subtitle: ", subtitle.Value.(string))
+	log.Println("plotLine:", "color-theme: ", colorTheme.Value.(string))
+
+	// If the given color theme is in the list of possible themes, we will
+	// enable it.
+	theme := charttypes.ThemeWesteros
+	if slices.Contains(Themes, colorTheme.Value.(string)) {
+		theme = colorTheme.Value.(string)
+	}
+
 	line.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{Theme: charttypes.ThemeWesteros}),
+		charts.WithInitializationOpts(opts.Initialization{
+			Theme:  theme,
+			Width:  "1200px",
+			Height: "600px",
+		}),
 		charts.WithTitleOpts(opts.Title{
 			Title:    title.Value.(string),
 			Subtitle: subtitle.Value.(string),
+			// Right:    "40%",
 		}),
+		// charts.WithLegendOpts(opts.Legend{Right: "80%"}),
+		charts.WithToolboxOpts(opts.Toolbox{
+			// Right: "5%",
+			Feature: &opts.ToolBoxFeature{
+				SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{
+					Type:  "jpg",
+					Title: "Download as jpg",
+				},
+				// DataView: &opts.ToolBoxFeatureDataView{
+				// 	Title: "DataView",
+				// 	// set the language
+				// 	// Chinese version: ["数据视图", "关闭", "刷新"]
+				// 	Lang: []string{"data view", "turn off", "refresh"},
+				// },
+			}},
+		),
 		charts.WithDataZoomOpts(opts.DataZoom{
 			Type: "slider",
 		}),
 	)
+
+	// Reverse X/Y (only on bar charts)
+	// line.XYReversal()
 
 	// Put data into instance
 	itemCount := 0
@@ -246,7 +300,15 @@ func plotLine(input any, call *nu.ExecCommand) error {
 		line = line.SetXAxis(xRange)
 	}
 
-	line.SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: opts.Bool(true)}))
+	line.SetSeriesOptions(
+		charts.WithLineChartOpts(opts.LineChart{
+			Smooth: opts.Bool(true),
+		}),
+		// For bar charts
+		// charts.WithBarChartOpts(opts.BarChart{
+		// 	Stack: "stackA",
+		// }),
+	)
 
 	chartFile, _ := os.CreateTemp("", "chart-*.html")
 	chartFileName := chartFile.Name()
