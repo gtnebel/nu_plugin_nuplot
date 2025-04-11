@@ -190,6 +190,11 @@ func plotLine(input any, call *nu.ExecCommand) error {
 					if v, ok := itemValue[xAxis.Value.(string)]; ok {
 						items := getSeries(series, XAxisSeries)
 						series[XAxisSeries] = append(items, matchXValue(v))
+					} else {
+						// If the column specified in --xaxis does not exist, we
+						// set the `xAxisOk` variable to false, so that a
+						// simple int range is generated as x axis.
+						xAxisOk = false
 					}
 				}
 			default:
