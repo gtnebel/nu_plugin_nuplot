@@ -115,6 +115,24 @@ func NuplotLine() *nu.Command {
 					VarId:    0,
 					Default:  &nu.Value{Value: "westeros"},
 				},
+				nu.Flag{
+					Long:     "width",
+					Short:    "W",
+					Shape:    syntaxshape.Int(),
+					Required: false,
+					Desc:     "Width of chart in pixels",
+					VarId:    0,
+					Default:  &nu.Value{Value: 1200},
+				},
+				nu.Flag{
+					Long:     "height",
+					Short:    "H",
+					Shape:    syntaxshape.Int(),
+					Required: false,
+					Desc:     "Height of chart in pixels",
+					VarId:    0,
+					Default:  &nu.Value{Value: 600},
+				},
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
@@ -231,9 +249,13 @@ func plotLine(input any, call *nu.ExecCommand) error {
 	title, _ := call.FlagValue("title")
 	subtitle, _ := call.FlagValue("subtitle")
 	colorTheme, _ := call.FlagValue("color-theme")
+	width, _ := call.FlagValue("width")
+	height, _ := call.FlagValue("height")
 	log.Println("plotLine:", "title: ", title.Value.(string))
 	log.Println("plotLine:", "subtitle: ", subtitle.Value.(string))
 	log.Println("plotLine:", "color-theme: ", colorTheme.Value.(string))
+	log.Println("plotLine:", "width: ", width.Value.(int64))
+	log.Println("plotLine:", "height: ", height.Value.(int64))
 
 	// If the given color theme is in the list of possible themes, we will
 	// enable it.
@@ -245,8 +267,8 @@ func plotLine(input any, call *nu.ExecCommand) error {
 	line.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{
 			Theme:  theme,
-			Width:  "1200px",
-			Height: "600px",
+			Width:  fmt.Sprintf("%dpx", width.Value),
+			Height: fmt.Sprintf("%dpx", height.Value),
 		}),
 		charts.WithTitleOpts(opts.Title{
 			Title:    title.Value.(string),
