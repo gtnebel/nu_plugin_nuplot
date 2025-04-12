@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io"
 	"log"
-	// "os"
+	"os"
 	"slices"
 	"strconv"
 	"time"
 
-	// "github.com/pkg/browser"
+	"github.com/pkg/browser"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
@@ -149,4 +149,16 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 			Type: "slider",
 		}),
 	}
+}
+
+func renderChart(renderHandler func(f *os.File) error) {
+
+	chartFile, _ := os.CreateTemp("", "chart-*.html")
+	chartFileName := chartFile.Name()
+	log.Println("plotLine:", "Rendering output to", chartFileName)
+	renderHandler(chartFile) // TODO: handle errors
+	chartFile.Close()
+
+	browser.OpenFile(chartFileName)
+
 }

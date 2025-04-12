@@ -10,7 +10,7 @@ import (
 	// "strconv"
 	// "time"
 
-	"github.com/pkg/browser"
+	// "github.com/pkg/browser"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
@@ -168,13 +168,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 		// }),
 	)
 
-	chartFile, _ := os.CreateTemp("", "chart-*.html")
-	chartFileName := chartFile.Name()
-	log.Println("plotLine:", "Rendering output to", chartFileName)
-	line.Render(chartFile)
-	chartFile.Close()
-
-	browser.OpenFile(chartFileName)
+	renderChart(func(f *os.File) error { return line.Render(f) })
 
 	return nil
 }
