@@ -79,9 +79,8 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 func plotLine(input any, call *nu.ExecCommand) error {
 	series := make(LineDataSeries)
 
-	xAxis, xAxisSet := call.FlagValue("xaxis")
-	xAxisName := xAxis.Value.(string)
-	log.Println("plotLine:", "xAxis:", xAxisSet, xAxis)
+	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
+	log.Println("plotLine:", "xAxisName:", xAxisName)
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
@@ -108,15 +107,15 @@ func plotLine(input any, call *nu.ExecCommand) error {
 				}
 
 				// If a xaxis is defined, fill the series with the values.
-				if xAxisSet {
+				if xAxisName != XAxisSeries {
 					if v, ok := itemValue[xAxisName]; ok {
-						items := getLineSeries(series, XAxisSeries)
-						series[XAxisSeries] = append(items, opts.LineData{Value: matchXValue(v)})
+						items := getLineSeries(series, xAxisName)
+						series[xAxisName] = append(items, opts.LineData{Value: matchXValue(v)})
 					} else {
 						// If the column specified in --xaxis does not exist, we
-						// set the `xAxisOk` variable to false, so that a
+						// set the `xAxisName` variable to XAxisSeries, so that a
 						// simple int range is generated as x axis.
-						xAxisSet = false
+						xAxisName = XAxisSeries
 					}
 				}
 			default:
@@ -138,7 +137,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 	// Put data into instance
 	itemCount := 0
 	for sName, sValues := range series {
-		if sName == XAxisSeries {
+		if sName == xAxisName {
 			continue
 		}
 
@@ -147,8 +146,8 @@ func plotLine(input any, call *nu.ExecCommand) error {
 		line = line.AddSeries(sName, sValues)
 	}
 
-	if xAxisSet {
-		line = line.SetXAxis(series[XAxisSeries])
+	if xAxisName != XAxisSeries {
+		line = line.SetXAxis(series[xAxisName])
 	} else {
 		xRange := make([]int, itemCount)
 		for i := range itemCount {
