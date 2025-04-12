@@ -13,7 +13,7 @@ var (
 		Required: false,
 		Desc:     "The chart title",
 		VarId:    0,
-		Default:  &nu.Value{Value: "Line chart"},
+		Default:  &nu.Value{Value: "Chart title"},
 	}
 
 	SubTitle = nu.Flag{

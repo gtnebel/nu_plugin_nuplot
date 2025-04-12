@@ -32,6 +32,26 @@ var Themes = []string{
 	"romantic", "shine", "vintage", "walden", "westeros", "wonderland",
 }
 
+func getStringFlag(call *nu.ExecCommand, name string, deflt string) string {
+	value, _ := call.FlagValue(name)
+
+	if value.Value != nil {
+		return value.Value.(string)
+	} else {
+		return deflt
+	}
+}
+
+func getIntFlag(call *nu.ExecCommand, name string, deflt int64) int64 {
+	value, _ := call.FlagValue(name)
+
+	if value.Value != nil {
+		return value.Value.(int64)
+	} else {
+		return deflt
+	}
+}
+
 func matchXValue(nuValue nu.Value) any {
 	const IsoDate = "2006-01-02 15:04:05 -07:00"
 
@@ -100,33 +120,33 @@ func handleCommandInput(call *nu.ExecCommand, plotFunc PlotHandlerFunc) error {
 
 func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 	// set some global options like Title/Legend/ToolTip or anything else
-	title, _ := call.FlagValue("title")
-	subtitle, _ := call.FlagValue("subtitle")
-	colorTheme, _ := call.FlagValue("color-theme")
-	width, _ := call.FlagValue("width")
-	height, _ := call.FlagValue("height")
-	log.Println("plotLine:", "title: ", title.Value.(string))
-	log.Println("plotLine:", "subtitle: ", subtitle.Value.(string))
-	log.Println("plotLine:", "color-theme: ", colorTheme.Value.(string))
-	log.Println("plotLine:", "width: ", width.Value.(int64))
-	log.Println("plotLine:", "height: ", height.Value.(int64))
+	title := getStringFlag(call, "title", "Chart title")
+	subtitle := getStringFlag(call, "subtitle", "This chart was rendered by nuplot.")
+	colorTheme := getStringFlag(call, "color-theme", charttypes.ThemeWesteros)
+	width := getIntFlag(call, "width", 1200)
+	height := getIntFlag(call, "height", 600)
+	log.Println("buildGlobalChartOptions:", "title: ", title)
+	log.Println("buildGlobalChartOptions:", "subtitle: ", subtitle)
+	log.Println("buildGlobalChartOptions:", "color-theme: ", colorTheme)
+	log.Println("buildGlobalChartOptions:", "width: ", width)
+	log.Println("buildGlobalChartOptions:", "height: ", height)
 
 	// If the given color theme is in the list of possible themes, we will
 	// enable it.
 	theme := charttypes.ThemeWesteros
-	if slices.Contains(Themes, colorTheme.Value.(string)) {
-		theme = colorTheme.Value.(string)
+	if slices.Contains(Themes, colorTheme) {
+		theme = colorTheme
 	}
 
 	return []charts.GlobalOpts{
 		charts.WithInitializationOpts(opts.Initialization{
 			Theme:  theme,
-			Width:  fmt.Sprintf("%dpx", width.Value),
-			Height: fmt.Sprintf("%dpx", height.Value),
+			Width:  fmt.Sprintf("%dpx", width),
+			Height: fmt.Sprintf("%dpx", height),
 		}),
 		charts.WithTitleOpts(opts.Title{
-			Title:    title.Value.(string),
-			Subtitle: subtitle.Value.(string),
+			Title:    title,
+			Subtitle: subtitle,
 			// Right:    "40%",
 		}),
 		// charts.WithLegendOpts(opts.Legend{Right: "80%"}),
@@ -152,7 +172,6 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 }
 
 func renderChart(renderHandler func(f *os.File) error) {
-
 	chartFile, _ := os.CreateTemp("", "chart-*.html")
 	chartFileName := chartFile.Name()
 	log.Println("plotLine:", "Rendering output to", chartFileName)
@@ -160,5 +179,4 @@ func renderChart(renderHandler func(f *os.File) error) {
 	chartFile.Close()
 
 	browser.OpenFile(chartFileName)
-
 }
