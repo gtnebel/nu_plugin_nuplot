@@ -29,12 +29,12 @@ func NuplotLine() *nu.Command {
 			SearchTerms: []string{"plot", "graph", "line", "bar"},
 			// OptionalPositional: nu.PositionalArgs{},
 			Named: nu.Flags{
+				flags.XAxis,
 				flags.Title,
 				flags.SubTitle,
-				flags.XAxis,
-				flags.ColorTheme,
 				flags.Width,
 				flags.Height,
+				flags.ColorTheme,
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
