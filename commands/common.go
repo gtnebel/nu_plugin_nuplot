@@ -32,6 +32,21 @@ var Themes = []string{
 	"romantic", "shine", "vintage", "walden", "westeros", "wonderland",
 }
 
+type ChartData interface {
+	opts.LineData | opts.BarData
+}
+
+func getSeries[SeriesType ChartData](series map[string][]SeriesType, name string) []SeriesType {
+	s, ok := series[name]
+
+	if ok {
+		return s
+	} else {
+		series[name] = make([]SeriesType, 0)
+		return series[name]
+	}
+}
+
 func getStringFlag(call *nu.ExecCommand, name string, deflt string) string {
 	value, _ := call.FlagValue(name)
 
@@ -148,6 +163,12 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 			Title:    title,
 			Subtitle: subtitle,
 			// Right:    "40%",
+		}),
+		charts.WithTooltipOpts(opts.Tooltip{
+			// Trigger: "item",
+			AxisPointer: &opts.AxisPointer{
+				Type: "cross",
+			},
 		}),
 		// charts.WithLegendOpts(opts.Legend{Right: "80%"}),
 		charts.WithToolboxOpts(opts.Toolbox{

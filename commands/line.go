@@ -3,40 +3,21 @@ package commands
 import (
 	"context"
 	"fmt"
-	// "io"
 	"log"
 	"os"
-	// "slices"
-	// "strconv"
-	// "time"
-
-	// "github.com/pkg/browser"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	// charttypes "github.com/go-echarts/go-echarts/v2/types"
 
 	"github.com/ainvaltin/nu-plugin"
-	// "github.com/ainvaltin/nu-plugin/syntaxshape"
 	"github.com/ainvaltin/nu-plugin/types"
 
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
-type LineData = []opts.LineData
+type LineDataList = []opts.LineData
 
-type LineDataSeries = map[string]LineData
-
-func getLineSeries(series LineDataSeries, name string) LineData {
-	s, ok := series[name]
-
-	if ok {
-		return s
-	} else {
-		series[name] = make(LineData, 0)
-		return series[name]
-	}
-}
+type LineDataSeries = map[string]LineDataList
 
 func NuplotLine() *nu.Command {
 	return &nu.Command{
@@ -44,7 +25,7 @@ func NuplotLine() *nu.Command {
 			Name:        "nuplot line",
 			Category:    "Chart",
 			Desc:        "Plots the data that is piped into the command as `echarts` graph.",
-			Description: "Title, size and color theme can be configured by flags. Each column that contains numbers will be plottet. The X axis can be set by means of the --x-axis flag.",
+			Description: "Title, size and color theme can be configured by flags. Each column that contains numbers will be plottet. The X axis can be set by means of the --xaxis flag.",
 			SearchTerms: []string{"plot", "graph", "line", "bar"},
 			// OptionalPositional: nu.PositionalArgs{},
 			Named: nu.Flags{
@@ -87,10 +68,10 @@ func plotLine(input any, call *nu.ExecCommand) error {
 		for _, item := range inputValue {
 			switch itemValue := item.Value.(type) {
 			case int64:
-				items := getLineSeries(series, DefaultSeries)
+				items := getSeries(series, DefaultSeries)
 				series[DefaultSeries] = append(items, opts.LineData{Value: itemValue})
 			case float64:
-				items := getLineSeries(series, DefaultSeries)
+				items := getSeries(series, DefaultSeries)
 				series[DefaultSeries] = append(items, opts.LineData{Value: itemValue})
 			case nu.Record:
 				for k, v := range itemValue {
@@ -101,7 +82,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 					_, ok1 := v.Value.(int64)
 					_, ok2 := v.Value.(float64)
 					if ok1 || ok2 {
-						items := getLineSeries(series, k)
+						items := getSeries(series, k)
 						series[k] = append(items, opts.LineData{Value: v.Value})
 					}
 				}
@@ -109,7 +90,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 				// If a xaxis is defined, fill the series with the values.
 				if xAxisName != XAxisSeries {
 					if v, ok := itemValue[xAxisName]; ok {
-						items := getLineSeries(series, xAxisName)
+						items := getSeries(series, xAxisName)
 						series[xAxisName] = append(items, opts.LineData{Value: matchXValue(v)})
 					} else {
 						// If the column specified in --xaxis does not exist, we
