@@ -37,6 +37,7 @@ func NuplotLine() *nu.Command {
 				flags.ColorTheme,
 			},
 			InputOutputTypes: []nu.InOutTypes{
+				{In: types.Table(types.RecordDef{}), Out: types.Nothing()},
 				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
 				{In: types.List(types.Number()), Out: types.Nothing()},
 			},
