@@ -65,4 +65,24 @@ var (
 		VarId:    0,
 		Default:  &nu.Value{Value: 600},
 	}
+
+	Stacked = nu.Flag{
+		Long:     "stacked",
+		Short:    "s",
+		Shape:    nil,
+		Required: false,
+		Desc:     "Plots data series as stacked bar chart.",
+		VarId:    0,
+		Default:  nil,
+	}
+
+	XYReverse = nu.Flag{
+		Long:     "xyreverse",
+		Short:    "r",
+		Shape:    nil,
+		Required: false,
+		Desc:     "Reverse the x and y axes",
+		VarId:    0,
+		Default:  nil,
+	}
 )

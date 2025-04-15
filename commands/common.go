@@ -67,6 +67,16 @@ func getIntFlag(call *nu.ExecCommand, name string, deflt int64) int64 {
 	}
 }
 
+func getBoolFlag(call *nu.ExecCommand, name string) bool {
+	value, _ := call.FlagValue(name)
+
+	if value.Value != nil {
+		return value.Value.(bool)
+	} else {
+		return false
+	}
+}
+
 func matchXValue(nuValue nu.Value) any {
 	const IsoDate = "2006-01-02 15:04:05 -07:00"
 

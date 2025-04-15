@@ -42,6 +42,7 @@ func main() {
 	p, err := nu.New(
 		[]*nu.Command{
 			commands.NuplotLine(),
+			commands.NuplotBar(),
 		},
 		PluginVersion,
 		nil,
