@@ -29,7 +29,6 @@ func NuplotPie() *nu.Command {
 			SearchTerms: []string{"plot", "graph", "pie"},
 			// OptionalPositional: nu.PositionalArgs{},
 			Named: nu.Flags{
-				// flags.XAxis,
 				flags.Title,
 				flags.SubTitle,
 				flags.Width,
@@ -61,43 +60,41 @@ func nuplotPieHandler(ctx context.Context, call *nu.ExecCommand) error {
 func plotPie(input any, call *nu.ExecCommand) error {
 	series := make(PieDataSeries)
 
-	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
-	log.Println("plotPie:", "xAxisName:", xAxisName)
+	seriesName := getStringFlag(call, flags.Title.Long, "Items")
+	log.Println("plotPie:", "seriesName:", seriesName)
+	valueCount := 0
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
 		for _, item := range inputValue {
 			switch itemValue := item.Value.(type) {
 			case int64:
-				items := getSeries(series, DefaultSeries)
-				series[DefaultSeries] = append(items, opts.PieData{Value: itemValue})
+				items := getSeries(series, seriesName)
+				valueCount += 1
+				series[seriesName] = append(
+					items,
+					opts.PieData{
+						Name:  fmt.Sprintf("Value %d", valueCount),
+						Value: itemValue,
+					},
+				)
 			case float64:
-				items := getSeries(series, DefaultSeries)
-				series[DefaultSeries] = append(items, opts.PieData{Value: itemValue})
+				items := getSeries(series, seriesName)
+				valueCount += 1
+				series[seriesName] = append(
+					items,
+					opts.PieData{
+						Name:  fmt.Sprintf("Value %d", valueCount),
+						Value: itemValue,
+					},
+				)
 			case nu.Record:
 				for k, v := range itemValue {
-					if k == xAxisName {
-						continue
-					}
-
 					_, ok1 := v.Value.(int64)
 					_, ok2 := v.Value.(float64)
 					if ok1 || ok2 {
 						items := getSeries(series, k)
 						series[k] = append(items, opts.PieData{Value: v.Value})
-					}
-				}
-
-				// If a xaxis is defined, fill the series with the values.
-				if xAxisName != XAxisSeries {
-					if v, ok := itemValue[xAxisName]; ok {
-						items := getSeries(series, xAxisName)
-						series[xAxisName] = append(items, opts.PieData{Value: matchXValue(v)})
-					} else {
-						// If the column specified in --xaxis does not exist, we
-						// set the `xAxisName` variable to XAxisSeries, so that a
-						// simple int range is generated as x axis.
-						xAxisName = XAxisSeries
 					}
 				}
 			default:
@@ -106,15 +103,11 @@ func plotPie(input any, call *nu.ExecCommand) error {
 		}
 	case nu.Record:
 		for k, v := range inputValue {
-			if k == xAxisName {
-				continue
-			}
-
 			_, ok1 := v.Value.(int64)
 			_, ok2 := v.Value.(float64)
 			if ok1 || ok2 {
-				items := getSeries(series, "Items")
-				series["Items"] = append(items, opts.PieData{Name: k, Value: v.Value})
+				items := getSeries(series, seriesName)
+				series[seriesName] = append(items, opts.PieData{Name: k, Value: v.Value})
 			}
 		}
 	default:
@@ -129,10 +122,6 @@ func plotPie(input any, call *nu.ExecCommand) error {
 	// Put data into instance
 	itemCount := 0
 	for sName, sValues := range series {
-		if sName == xAxisName {
-			continue
-		}
-
 		itemCount = len(sValues)
 		log.Println("plotPie:", "Adding", itemCount, "items to series", sName)
 		pie = pie.AddSeries(sName, sValues)

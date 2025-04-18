@@ -8,7 +8,7 @@ import (
 var (
 	Title = nu.Flag{
 		Long:     "title",
-		Short:    "t",
+		Short:    "T",
 		Shape:    syntaxshape.String(),
 		Required: false,
 		Desc:     "The chart title",
@@ -18,32 +18,12 @@ var (
 
 	SubTitle = nu.Flag{
 		Long:     "subtitle",
-		Short:    "s",
+		Short:    "S",
 		Shape:    syntaxshape.String(),
 		Required: false,
 		Desc:     "The chart subtitle",
 		VarId:    0,
 		Default:  &nu.Value{Value: "This chart was rendered by nuplot"},
-	}
-
-	XAxis = nu.Flag{
-		Long:     "xaxis",
-		Short:    "x",
-		Shape:    syntaxshape.String(), // TODO: CellPath not supported...
-		Required: false,
-		Desc:     "Only if input is a table: the column name wich holds the values for the x-axis",
-		VarId:    0,
-		// Default:  nil,
-	}
-
-	ColorTheme = nu.Flag{
-		Long:     "color-theme",
-		Short:    "c",
-		Shape:    syntaxshape.String(),
-		Required: false,
-		Desc:     "One of: chalk, essos, infographic, macarons, purple-passion, roma, romantic, shine, vintage, walden, westeros, wonderland,",
-		VarId:    0,
-		Default:  &nu.Value{Value: "westeros"},
 	}
 
 	Width = nu.Flag{
@@ -64,6 +44,26 @@ var (
 		Desc:     "Height of chart in pixels",
 		VarId:    0,
 		Default:  &nu.Value{Value: 600},
+	}
+
+	ColorTheme = nu.Flag{
+		Long:     "color-theme",
+		Short:    "C",
+		Shape:    syntaxshape.String(),
+		Required: false,
+		Desc:     "One of: chalk, essos, infographic, macarons, purple-passion, roma, romantic, shine, vintage, walden, westeros, wonderland,",
+		VarId:    0,
+		Default:  &nu.Value{Value: "westeros"},
+	}
+
+	XAxis = nu.Flag{
+		Long:     "xaxis",
+		Short:    "x",
+		Shape:    syntaxshape.String(), // TODO: CellPath not supported...
+		Required: false,
+		Desc:     "Only if input is a table: the column name wich holds the values for the x-axis",
+		VarId:    0,
+		// Default:  nil,
 	}
 
 	Stacked = nu.Flag{
