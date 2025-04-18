@@ -37,8 +37,8 @@ func NuplotPie() *nu.Command {
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Record(types.RecordDef{}), Out: types.Nothing()},
-				{In: types.Table(types.RecordDef{}), Out: types.Nothing()},
-				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
+				// {In: types.Table(types.RecordDef{}), Out: types.Nothing()}, // TODO
+				// {In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()}, // TODO
 				{In: types.List(types.Number()), Out: types.Nothing()},
 			},
 			AllowMissingExamples: true,
@@ -88,15 +88,15 @@ func plotPie(input any, call *nu.ExecCommand) error {
 						Value: itemValue,
 					},
 				)
-			case nu.Record:
-				for k, v := range itemValue {
-					_, ok1 := v.Value.(int64)
-					_, ok2 := v.Value.(float64)
-					if ok1 || ok2 {
-						items := getSeries(series, k)
-						series[k] = append(items, opts.PieData{Value: v.Value})
-					}
-				}
+			// case nu.Record:
+			// 	for k, v := range itemValue {
+			// 		_, ok1 := v.Value.(int64)
+			// 		_, ok2 := v.Value.(float64)
+			// 		if ok1 || ok2 {
+			// 			items := getSeries(series, k)
+			// 			series[k] = append(items, opts.PieData{Value: v.Value})
+			// 		}
+			// 	}
 			default:
 				return fmt.Errorf("unsupported input value type: %T", inputValue)
 			}
