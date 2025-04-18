@@ -33,7 +33,7 @@ var Themes = []string{
 }
 
 type ChartData interface {
-	opts.LineData | opts.BarData
+	opts.LineData | opts.BarData | opts.PieData
 }
 
 func getSeries[SeriesType ChartData](series map[string][]SeriesType, name string) []SeriesType {

@@ -43,6 +43,7 @@ func main() {
 		[]*nu.Command{
 			commands.NuplotLine(),
 			commands.NuplotBar(),
+			commands.NuplotPie(),
 		},
 		PluginVersion,
 		nil,
