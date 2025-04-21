@@ -38,7 +38,7 @@ func NuplotLine() *nu.Command {
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Table(types.RecordDef{}), Out: types.Nothing()},
-				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
+				// {In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
 				{In: types.List(types.Number()), Out: types.Nothing()},
 			},
 			AllowMissingExamples: true,
