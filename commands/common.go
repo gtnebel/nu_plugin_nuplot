@@ -4,7 +4,7 @@ import (
 	// "context"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"slices"
 	"strconv"
@@ -83,19 +83,19 @@ func matchXValue(nuValue nu.Value) any {
 	switch value := nuValue.Value.(type) {
 	case string:
 		if date, err := time.Parse(time.RFC3339, value); err == nil {
-			// log.Println("matchXValue:", "Value is RFC3339 date string")
+			// slog.Debug("matchXValue: Value is RFC3339 date string")
 			return date
 		}
 		if date, err := time.Parse(IsoDate, value); err == nil {
-			// log.Println("matchXValue:", "Value is ISO date string")
+			// slog.Debug("matchXValue: Value is ISO date string")
 			return date
 		}
 		if number, err := strconv.ParseFloat(value, 64); err == nil {
-			// log.Println("matchXValue:", "Value is number string")
+			// slog.Debug("matchXValue: Value is number string")
 			return number
 		}
 
-		log.Println("matchXValue:", "Value is unknown string:", value)
+		slog.Warn("matchXValue: Value is unknown string", "value", value)
 		return value
 	default:
 		return value
@@ -105,13 +105,13 @@ func matchXValue(nuValue nu.Value) any {
 func handleCommandInput(call *nu.ExecCommand, plotFunc PlotHandlerFunc) error {
 	switch in := call.Input.(type) {
 	case nil:
-		log.Println("handleCommandInput:", "Input is nil")
+		slog.Debug("handleCommandInput: Input is nil")
 		return nil
 	case nu.Value:
-		log.Println("handleCommandInput:", "Input is nu.Value")
+		slog.Debug("handleCommandInput: Input is nu.Value")
 		return plotFunc(in.Value, call)
 	case <-chan nu.Value:
-		log.Println("handleCommandInput:", "Input is <-chan nu.Value")
+		slog.Debug("handleCommandInput: Input is <-chan nu.Value")
 		inValues := make([]nu.Value, 0)
 
 		for v := range in {
@@ -120,7 +120,7 @@ func handleCommandInput(call *nu.ExecCommand, plotFunc PlotHandlerFunc) error {
 
 		return plotFunc(inValues, call)
 	case io.Reader:
-		log.Println("handleCommandInput:", "Input is io.Reader")
+		slog.Debug("handleCommandInput: Input is io.Reader")
 		// decoder wants io.ReadSeeker so we need to read to buf.
 		// could read just enough that the decoder can detect the
 		// format and stream the rest?
@@ -150,11 +150,11 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 	colorTheme := getStringFlag(call, "color-theme", charttypes.ThemeWesteros)
 	width := getIntFlag(call, "width", 1200)
 	height := getIntFlag(call, "height", 600)
-	log.Println("buildGlobalChartOptions:", "title: ", title)
-	log.Println("buildGlobalChartOptions:", "subtitle: ", subtitle)
-	log.Println("buildGlobalChartOptions:", "color-theme: ", colorTheme)
-	log.Println("buildGlobalChartOptions:", "width: ", width)
-	log.Println("buildGlobalChartOptions:", "height: ", height)
+	slog.Debug("buildGlobalChartOptions", "title", title)
+	slog.Debug("buildGlobalChartOptions", "subtitle", subtitle)
+	slog.Debug("buildGlobalChartOptions", "color-theme", colorTheme)
+	slog.Debug("buildGlobalChartOptions", "width", width)
+	slog.Debug("buildGlobalChartOptions", "height", height)
 
 	// If the given color theme is in the list of possible themes, we will
 	// enable it.
@@ -205,7 +205,7 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 func renderChart(renderHandler func(f *os.File) error) {
 	chartFile, _ := os.CreateTemp("", "chart-*.html")
 	chartFileName := chartFile.Name()
-	log.Println("plotLine:", "Rendering output to", chartFileName)
+	slog.Debug("plotLine: Rendering output", "filename", chartFileName)
 	renderHandler(chartFile) // TODO: handle errors
 	chartFile.Close()
 

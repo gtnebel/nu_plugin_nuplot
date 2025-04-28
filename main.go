@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,6 +40,8 @@ func quitSignalContext() context.Context {
 // }
 
 func main() {
+	slog.SetLogLoggerLevel(slog.LevelInfo)
+
 	p, err := nu.New(
 		[]*nu.Command{
 			commands.NuplotLine(),
@@ -49,11 +52,11 @@ func main() {
 		nil,
 	)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "failed to create plugin", err)
+		slog.Error("failed to create plugin", "error", err)
 		return
 	}
 	if err := p.Run(quitSignalContext()); err != nil && !errors.Is(err, nu.ErrGoodbye) {
-		fmt.Fprintln(os.Stderr, "plugin exited with error", err)
+		slog.Error("plugin exited with error", "error", err)
 	}
 
 	// // create a new bar instance

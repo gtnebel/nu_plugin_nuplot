@@ -3,7 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
@@ -61,7 +61,7 @@ func plotPie(input any, call *nu.ExecCommand) error {
 	series := make(PieDataSeries)
 
 	seriesName := getStringFlag(call, flags.Title.Long, "Items")
-	log.Println("plotPie:", "seriesName:", seriesName)
+	slog.Debug("plotPie", "seriesName", seriesName)
 	valueCount := 0
 
 	switch inputValue := input.(type) {
@@ -123,7 +123,7 @@ func plotPie(input any, call *nu.ExecCommand) error {
 	itemCount := 0
 	for sName, sValues := range series {
 		itemCount = len(sValues)
-		log.Println("plotPie:", "Adding", itemCount, "items to series", sName)
+		slog.Debug("plotPie: Adding items to series", "series", sName, "items", itemCount)
 		pie = pie.AddSeries(sName, sValues)
 	}
 

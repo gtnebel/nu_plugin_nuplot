@@ -3,7 +3,7 @@ package commands
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
@@ -64,7 +64,7 @@ func plotBar(input any, call *nu.ExecCommand) error {
 	series := make(BarDataSeries)
 
 	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
-	log.Println("plotBar:", "xAxisName:", xAxisName)
+	slog.Debug("plotBar", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
@@ -128,7 +128,7 @@ func plotBar(input any, call *nu.ExecCommand) error {
 		}
 
 		itemCount = len(sValues)
-		log.Println("plotBar:", "Adding", itemCount, "items to series", sName)
+		slog.Debug("plotBar: Adding items to series", "series", sName, "items", itemCount)
 		bar = bar.AddSeries(sName, sValues)
 	}
 
