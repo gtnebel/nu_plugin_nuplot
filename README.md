@@ -14,6 +14,26 @@
     - List of numbers (values without labels)
     - Record (record key is then label)
 
+## Examples
+
+#### A Simple Pie chart
+
+```nushell
+{'apples': 7 'oranges': 5 'bananas': 3} | nuplot pie --title "Fruits"
+```
+
+#### Show weather forcast from wttr.in as bar chart
+
+```nushell
+http get http://wttr.in?format=j1
+| get weather
+| select date avgtempC
+| each {|l| {date: ($l.date | into datetime) avgtempC: ($l.avgtempC | into int)} }
+| nuplot bar --xaxis date --title "Weather forcast" --color-theme shine
+```
+
+The data type conversion for `avgtempC` is needed, because nuplot only shows series of numbers. The data type conversion of the `date` column can be omitted but will lead to warnings in the moment because the date format is not recognized correctly.
+
 ## Build and install
 
 **Prerequisits:** You will need the Go compiler to build the project.
