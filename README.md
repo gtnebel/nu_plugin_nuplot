@@ -1,6 +1,6 @@
 # nuplot
 
-`nuplot` is a Nushell plugin for plotting charts.
+`nuplot` is a [nushell](https://www.nushell.sh) plugin for plotting charts. It builds interactive charts from your data that are opened inside the web browser. 
 
 ## Features
 
@@ -22,6 +22,8 @@
 {'apples': 7 'oranges': 5 'bananas': 3} | nuplot pie --title "Fruits"
 ```
 
+![Fruits](https://github.com/user-attachments/assets/848bdd94-364b-4c9e-b196-32e8d032bbd1)
+
 #### Show weather forcast from wttr.in as bar chart
 
 ```nushell
@@ -29,10 +31,12 @@ http get http://wttr.in?format=j1
 | get weather
 | select date avgtempC
 | each {|l| {date: ($l.date | into datetime) avgtempC: ($l.avgtempC | into int)} }
-| nuplot bar --xaxis date --title "Weather forcast" --color-theme shine
+| nuplot bar --xaxis date --title "Weather forcast"
 ```
 
 The data type conversion for `avgtempC` is needed, because nuplot only shows series of numbers. The data type conversion of the `date` column can be omitted but will lead to warnings in the moment because the date format is not recognized correctly.
+
+![Weather forcast (1)](https://github.com/user-attachments/assets/0674aa72-37e9-4868-a156-31cf990fbde9)
 
 ## Build and install
 
