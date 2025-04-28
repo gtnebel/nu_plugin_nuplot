@@ -2,14 +2,21 @@
 
 `nuplot` is a Nushell plugin for plotting charts.
 
-## Project status
+## Features
 
-The plugin is still in early development. Currently, only the line chart is
-supported and the plugin still writes lots of debugging infos to `stderr`.
+- The plugin shows line, (stacked) bar and pie charts.
+- Chart title, size and color theme can be adjusted
+- Input types:
+  - **line chart** and **bar chart**
+    - List of numbers (a single series)
+    - Table (one series per column)
+  - **pie chart**
+    - List of numbers (values without labels)
+    - Record (record key is then label)
 
 ## Build and install
 
-**Prerequisits:** You will need the Go compiler to compile the project.
+**Prerequisits:** You will need the Go compiler to build the project.
 
 Check out the project
 
@@ -35,10 +42,11 @@ Now, `help nuplot line` should show the help for the line chart.
 
 - [ ] Implement chart types
   - [x] Line chart
-  - [ ] Bar chart
-  - [ ] Stacked bar chart
+  - [x] Bar chart
+  - [x] Stacked bar chart
+  - [x] Pie chart
   - [ ] ...
-- [ ] Define a default set of flags for all chart types
-- [ ] Define reasonable default features for all charts
+- [x] Define a default set of flags for all chart types
+- [x] Define reasonable default features for all charts
 - [ ] Documentation
 - [ ] Packaging
