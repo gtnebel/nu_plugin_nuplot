@@ -1,7 +1,8 @@
+// This package holds all plugin subcommands along with common data types
+// and functions used by all subcommands. 
 package commands
 
 import (
-	// "context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -17,25 +18,31 @@ import (
 	charttypes "github.com/go-echarts/go-echarts/v2/types"
 
 	"github.com/ainvaltin/nu-plugin"
-	// "github.com/ainvaltin/nu-plugin/syntaxshape"
-	// "github.com/ainvaltin/nu-plugin/types"
-	// "github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
+// Handler function that implements the output of a specific plot.
+// This type is used in the [handleCommandInput] function.
 type PlotHandlerFunc = func(any, *nu.ExecCommand) error
 
+// Default name of a series if no other name is given.
 const DefaultSeries = "Items"
+// Internal name of the series representing the x axis.
 const XAxisSeries = "__x_axis__"
 
+// List of all availlable themes
 var Themes = []string{
 	"chalk", "essos", "infographic", "macarons", "purple-passion", "roma",
 	"romantic", "shine", "vintage", "walden", "westeros", "wonderland",
 }
 
+// Abstract data type so that [getSeries] can be called for all plot types.
 type ChartData interface {
 	opts.LineData | opts.BarData | opts.PieData
 }
 
+// Retrieves a series with the given name from the series map. If the given
+// series does not exist yet in the map, it is automatically  created and
+// returned. 
 func getSeries[SeriesType ChartData](series map[string][]SeriesType, name string) []SeriesType {
 	s, ok := series[name]
 

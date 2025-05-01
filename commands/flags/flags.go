@@ -1,3 +1,4 @@
+// This package holds the flags used in all subcommands.
 package flags
 
 import (
