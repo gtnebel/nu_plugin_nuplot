@@ -1,3 +1,6 @@
+// nu_plugin_nuplot is a [Nushell](https://nushell.sh/) plugin for plotting charts. 
+// It builds interactive charts from your data that are opened inside the web
+// browser.
 package main
 
 import (
