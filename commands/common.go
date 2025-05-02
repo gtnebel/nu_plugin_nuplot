@@ -1,5 +1,5 @@
 // This package holds all plugin subcommands along with common data types
-// and functions used by all subcommands. 
+// and functions used by all subcommands.
 package commands
 
 import (
@@ -26,6 +26,7 @@ type PlotHandlerFunc = func(any, *nu.ExecCommand) error
 
 // Default name of a series if no other name is given.
 const DefaultSeries = "Items"
+
 // Internal name of the series representing the x axis.
 const XAxisSeries = "__x_axis__"
 
@@ -42,7 +43,7 @@ type ChartData interface {
 
 // Retrieves a series with the given name from the series map. If the given
 // series does not exist yet in the map, it is automatically  created and
-// returned. 
+// returned.
 func getSeries[SeriesType ChartData](series map[string][]SeriesType, name string) []SeriesType {
 	s, ok := series[name]
 
@@ -54,6 +55,8 @@ func getSeries[SeriesType ChartData](series map[string][]SeriesType, name string
 	}
 }
 
+// Retrieve the string value of a flag from the call. The name of the flag and
+// a default value has to be provided.
 func getStringFlag(call *nu.ExecCommand, name string, deflt string) string {
 	value, _ := call.FlagValue(name)
 
@@ -64,6 +67,8 @@ func getStringFlag(call *nu.ExecCommand, name string, deflt string) string {
 	}
 }
 
+// Retrieve the int64 value of a flag from the call. The name of the flag and
+// a default value has to be provided.
 func getIntFlag(call *nu.ExecCommand, name string, deflt int64) int64 {
 	value, _ := call.FlagValue(name)
 
@@ -74,6 +79,7 @@ func getIntFlag(call *nu.ExecCommand, name string, deflt int64) int64 {
 	}
 }
 
+// Retrieve the bool value of a flag from the call. The default value is false.
 func getBoolFlag(call *nu.ExecCommand, name string) bool {
 	value, _ := call.FlagValue(name)
 
@@ -84,6 +90,9 @@ func getBoolFlag(call *nu.ExecCommand, name string) bool {
 	}
 }
 
+// Tries to parse the xaxis values into [time.Time] or [float]. This is useful
+// when data is loaded from CSV or JSON files, where dates and numbers are
+// sometimes represented as strings.
 func matchXValue(nuValue nu.Value) any {
 	const IsoDate = "2006-01-02 15:04:05 -07:00"
 
@@ -109,6 +118,9 @@ func matchXValue(nuValue nu.Value) any {
 	}
 }
 
+// This is the top level handler function that is called from the [nu.Command].
+// The function analyzes, in which format the input values are given and than
+// calls the provided plotFunc [PlotHandlerFunc] function.
 func handleCommandInput(call *nu.ExecCommand, plotFunc PlotHandlerFunc) error {
 	switch in := call.Input.(type) {
 	case nil:
@@ -150,6 +162,7 @@ func handleCommandInput(call *nu.ExecCommand, plotFunc PlotHandlerFunc) error {
 	}
 }
 
+// Builds the global chart options that determine the appearance of the chart.
 func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 	// set some global options like Title/Legend/ToolTip or anything else
 	title := getStringFlag(call, "title", "Chart title")
@@ -209,6 +222,9 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 	}
 }
 
+// Helper function that wraps the creation of the temporary file the chart is
+// saved into and than opening the file in the web browser. The renderHandler
+// function performs the actual plotting of the chart.
 func renderChart(renderHandler func(f *os.File) error) {
 	chartFile, _ := os.CreateTemp("", "chart-*.html")
 	chartFileName := chartFile.Name()
