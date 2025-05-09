@@ -21,6 +21,8 @@ type BoxPlotDataList = []opts.BoxPlotData
 
 type BoxPlotDataSeries = map[string]BoxPlotDataList
 
+type BoxPlotSeriesHelper = map[string][]float64
+
 func NuplotBoxPlot() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{
@@ -75,6 +77,7 @@ func createBoxPlotDataValue(data []float64) []float64 {
 }
 
 func plotBoxPlot(input any, call *nu.ExecCommand) error {
+	seriesHelper := make(BoxPlotSeriesHelper)
 	series := make(BoxPlotDataSeries)
 
 	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
@@ -85,37 +88,39 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 		for _, item := range inputValue {
 			switch itemValue := item.Value.(type) {
 			case int64:
-				items := getSeries(series, DefaultSeries)
-				series[DefaultSeries] = append(items, opts.BoxPlotData{Value: itemValue})
+				items := getSeries(seriesHelper, DefaultSeries)
+				seriesHelper[DefaultSeries] = append(items, float64(itemValue))
 			case float64:
-				items := getSeries(series, DefaultSeries)
-				series[DefaultSeries] = append(items, opts.BoxPlotData{Value: itemValue})
+				items := getSeries(seriesHelper, DefaultSeries)
+				seriesHelper[DefaultSeries] = append(items, itemValue)
 			case nu.Record:
 				for k, v := range itemValue {
 					if k == xAxisName {
 						continue
 					}
 
-					_, ok1 := v.Value.(int64)
-					_, ok2 := v.Value.(float64)
-					if ok1 || ok2 {
-						items := getSeries(series, k)
-						series[k] = append(items, opts.BoxPlotData{Value: v.Value})
+					items := getSeries(seriesHelper, k)
+
+					switch vValue := v.Value.(type) {
+					case int64:
+						seriesHelper[k] = append(items, float64(vValue))
+					case float64:
+						seriesHelper[k] = append(items, vValue)
 					}
 				}
 
-				// If a xaxis is defined, fill the series with the values.
-				if xAxisName != XAxisSeries {
-					if v, ok := itemValue[xAxisName]; ok {
-						items := getSeries(series, xAxisName)
-						series[xAxisName] = append(items, opts.BoxPlotData{Value: matchXValue(v)})
-					} else {
-						// If the column specified in --xaxis does not exist, we
-						// set the `xAxisName` variable to XAxisSeries, so that a
-						// simple int range is generated as x axis.
-						xAxisName = XAxisSeries
-					}
-				}
+				// // If a xaxis is defined, fill the series with the values.
+				// if xAxisName != XAxisSeries {
+				// 	if v, ok := itemValue[xAxisName]; ok {
+				// 		items := getSeries(series, xAxisName)
+				// 		series[xAxisName] = append(items, opts.BoxPlotData{Value: matchXValue(v)})
+				// 	} else {
+				// 		// If the column specified in --xaxis does not exist, we
+				// 		// set the `xAxisName` variable to XAxisSeries, so that a
+				// 		// simple int range is generated as x axis.
+				// 		xAxisName = XAxisSeries
+				// 	}
+				// }
 			default:
 				return fmt.Errorf("unsupported input value type: %T", inputValue)
 			}
@@ -134,14 +139,17 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 
 	// Put data into instance
 	itemCount := 0
-	for sName, sValues := range series {
+	for sName, sValues := range seriesHelper {
 		if sName == xAxisName {
 			continue
 		}
 
-		itemCount = len(sValues)
-		slog.Debug("plotBoxPlot: Adding items to series", "series", sName, "items", itemCount)
-		boxplot = boxplot.AddSeries(sName, sValues)
+		// itemCount = len(sValues)
+		// slog.Debug("plotBoxPlot: Adding items to series", "series", sName, "items", itemCount)
+		data := make(BoxPlotDataList, 1)
+		data[0] = opts.BoxPlotData{Value: createBoxPlotDataValue(sValues)}
+
+		boxplot = boxplot.AddSeries(sName, data)
 	}
 
 	if xAxisName != XAxisSeries {
@@ -155,15 +163,12 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 		boxplot = boxplot.SetXAxis(xRange)
 	}
 
-	boxplot.SetSeriesOptions(
-		charts.WithLineChartOpts(opts.LineChart{
-			Smooth: opts.Bool(true),
-		}),
-		// For bar charts
-		// charts.WithBarChartOpts(opts.BarChart{
-		// 	Stack: "stackA",
-		// }),
-	)
+	// boxplot.SetSeriesOptions(
+	// 	// For bar charts
+	// 	// charts.WithBarChartOpts(opts.BarChart{
+	// 	// 	Stack: "stackA",
+	// 	// }),
+	// )
 
 	renderChart(func(f *os.File) error { return boxplot.Render(f) })
 

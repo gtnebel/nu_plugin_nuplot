@@ -38,7 +38,7 @@ var Themes = []string{
 
 // Abstract data type so that [getSeries] can be called for all plot types.
 type ChartData interface {
-	opts.LineData | opts.BarData | opts.PieData | opts.BoxPlotData
+	float64 | opts.LineData | opts.BarData | opts.PieData | opts.BoxPlotData
 }
 
 // Retrieves a series with the given name from the series map. If the given
