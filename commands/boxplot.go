@@ -146,6 +146,7 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 
 		// itemCount = len(sValues)
 		// slog.Debug("plotBoxPlot: Adding items to series", "series", sName, "items", itemCount)
+		itemCount = 1
 		data := make(BoxPlotDataList, 1)
 		data[0] = opts.BoxPlotData{Value: createBoxPlotDataValue(sValues)}
 
