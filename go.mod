@@ -7,6 +7,7 @@ toolchain go1.23.8
 require (
 	github.com/ainvaltin/nu-plugin v0.0.0-20250407200522-037bb1c02bd6
 	github.com/go-echarts/go-echarts/v2 v2.5.2
+	github.com/montanaflynn/stats v0.7.1
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 )
 
