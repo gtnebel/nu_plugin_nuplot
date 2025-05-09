@@ -42,8 +42,9 @@ func NuplotBoxPlot() *nu.Command {
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Table(types.RecordDef{}), Out: types.Nothing()},
-				// {In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
 				{In: types.List(types.Number()), Out: types.Nothing()},
+				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
+				{In: types.List(types.List(types.Number())), Out: types.Nothing()},
 			},
 			AllowMissingExamples: true,
 		},
@@ -76,6 +77,53 @@ func createBoxPlotDataValue(data []float64) []float64 {
 	}
 }
 
+func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisName string) error {
+	for _, item := range table {
+		switch itemValue := item.Value.(type) {
+		case int64:
+			items := getSeries(seriesHelper, DefaultSeries)
+			seriesHelper[DefaultSeries] = append(items, float64(itemValue))
+		case float64:
+			items := getSeries(seriesHelper, DefaultSeries)
+			seriesHelper[DefaultSeries] = append(items, itemValue)
+		case nu.Record:
+			for k, v := range itemValue {
+				if k == xAxisName {
+					continue
+				}
+
+				items := getSeries(seriesHelper, k)
+
+				switch vValue := v.Value.(type) {
+				case int64:
+					seriesHelper[k] = append(items, float64(vValue))
+				case float64:
+					seriesHelper[k] = append(items, vValue)
+				}
+			}
+			// // If a xaxis is defined, fill the series with the values.
+			// if xAxisName != XAxisSeries {
+			// 	if v, ok := itemValue[xAxisName]; ok {
+			// 		items := getSeries(series, xAxisName)
+			// 		series[xAxisName] = append(items, opts.BoxPlotData{Value: matchXValue(v)})
+			// 	} else {
+			// 		// If the column specified in --xaxis does not exist, we
+			// 		// set the `xAxisName` variable to XAxisSeries, so that a
+			// 		// simple int range is generated as x axis.
+			// 		xAxisName = XAxisSeries
+			// 	}
+			// }
+		case []nu.Value:
+			// The input value is a list of tables
+			readTableValue(itemValue, seriesHelper, xAxisName)
+		default:
+			return fmt.Errorf("unsupported input value type: %T", table)
+		}
+	}
+
+	return nil
+}
+
 func plotBoxPlot(input any, call *nu.ExecCommand) error {
 	seriesHelper := make(BoxPlotSeriesHelper)
 	series := make(BoxPlotDataSeries)
@@ -85,46 +133,49 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
-		for _, item := range inputValue {
-			switch itemValue := item.Value.(type) {
-			case int64:
-				items := getSeries(seriesHelper, DefaultSeries)
-				seriesHelper[DefaultSeries] = append(items, float64(itemValue))
-			case float64:
-				items := getSeries(seriesHelper, DefaultSeries)
-				seriesHelper[DefaultSeries] = append(items, itemValue)
-			case nu.Record:
-				for k, v := range itemValue {
-					if k == xAxisName {
-						continue
-					}
+		// for _, item := range inputValue {
+		// 	switch itemValue := item.Value.(type) {
+		// 	case int64:
+		// 		items := getSeries(seriesHelper, DefaultSeries)
+		// 		seriesHelper[DefaultSeries] = append(items, float64(itemValue))
+		// 	case float64:
+		// 		items := getSeries(seriesHelper, DefaultSeries)
+		// 		seriesHelper[DefaultSeries] = append(items, itemValue)
+		// 	case nu.Record:
+		// 		for k, v := range itemValue {
+		// 			if k == xAxisName {
+		// 				continue
+		// 			}
 
-					items := getSeries(seriesHelper, k)
+		// 			items := getSeries(seriesHelper, k)
 
-					switch vValue := v.Value.(type) {
-					case int64:
-						seriesHelper[k] = append(items, float64(vValue))
-					case float64:
-						seriesHelper[k] = append(items, vValue)
-					}
-				}
+		// 			switch vValue := v.Value.(type) {
+		// 			case int64:
+		// 				seriesHelper[k] = append(items, float64(vValue))
+		// 			case float64:
+		// 				seriesHelper[k] = append(items, vValue)
+		// 			}
+		// 		}
+		// 		// // If a xaxis is defined, fill the series with the values.
+		// 		// if xAxisName != XAxisSeries {
+		// 		// 	if v, ok := itemValue[xAxisName]; ok {
+		// 		// 		items := getSeries(series, xAxisName)
+		// 		// 		series[xAxisName] = append(items, opts.BoxPlotData{Value: matchXValue(v)})
+		// 		// 	} else {
+		// 		// 		// If the column specified in --xaxis does not exist, we
+		// 		// 		// set the `xAxisName` variable to XAxisSeries, so that a
+		// 		// 		// simple int range is generated as x axis.
+		// 		// 		xAxisName = XAxisSeries
+		// 		// 	}
+		// 		// }
+		// 	case []nu.Value:
+		// 		// The input value is a list of tables
 
-				// // If a xaxis is defined, fill the series with the values.
-				// if xAxisName != XAxisSeries {
-				// 	if v, ok := itemValue[xAxisName]; ok {
-				// 		items := getSeries(series, xAxisName)
-				// 		series[xAxisName] = append(items, opts.BoxPlotData{Value: matchXValue(v)})
-				// 	} else {
-				// 		// If the column specified in --xaxis does not exist, we
-				// 		// set the `xAxisName` variable to XAxisSeries, so that a
-				// 		// simple int range is generated as x axis.
-				// 		xAxisName = XAxisSeries
-				// 	}
-				// }
-			default:
-				return fmt.Errorf("unsupported input value type: %T", inputValue)
-			}
-		}
+		// 	default:
+		// 		return fmt.Errorf("unsupported input value type: %T", inputValue)
+		// 	}
+		// }
+		readTableValue(inputValue, seriesHelper, xAxisName)
 	default:
 		return fmt.Errorf("unsupported input value type: %T", inputValue)
 	}
