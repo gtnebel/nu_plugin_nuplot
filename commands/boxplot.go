@@ -39,6 +39,7 @@ func NuplotBoxPlot() *nu.Command {
 				flags.Width,
 				flags.Height,
 				flags.ColorTheme,
+				flags.Fitted,
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Table(types.RecordDef{}), Out: types.Nothing()},

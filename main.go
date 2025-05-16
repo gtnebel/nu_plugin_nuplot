@@ -39,6 +39,7 @@ func main() {
 	p, err := nu.New(
 		[]*nu.Command{
 			commands.NuplotLine(),
+			commands.NuplotKline(),
 			commands.NuplotBar(),
 			commands.NuplotPie(),
 			commands.NuplotBoxPlot(),

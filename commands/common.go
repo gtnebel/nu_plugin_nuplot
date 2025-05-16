@@ -38,7 +38,7 @@ var Themes = []string{
 
 // Abstract data type so that [getSeries] can be called for all plot types.
 type ChartData interface {
-	float64 | opts.LineData | opts.BarData | opts.PieData | opts.BoxPlotData
+	float64 | opts.LineData | opts.BarData | opts.PieData | opts.BoxPlotData | opts.KlineData
 }
 
 // Retrieves a series with the given name from the series map. If the given
@@ -95,6 +95,8 @@ func getBoolFlag(call *nu.ExecCommand, name string) bool {
 // sometimes represented as strings.
 func matchXValue(nuValue nu.Value) any {
 	const IsoDate = "2006-01-02 15:04:05 -07:00"
+	const IsoDate_Local = "2006-01-02 15:04:05"
+	const IsoDate_Date = "2006-01-02"
 
 	switch value := nuValue.Value.(type) {
 	case string:
@@ -104,6 +106,14 @@ func matchXValue(nuValue nu.Value) any {
 		}
 		if date, err := time.Parse(IsoDate, value); err == nil {
 			// slog.Debug("matchXValue: Value is ISO date string")
+			return date
+		}
+		if date, err := time.ParseInLocation(IsoDate_Local, value, time.Local); err == nil {
+			// slog.Debug("matchXValue: Value is ISO date (local time) string")
+			return date
+		}
+		if date, err := time.ParseInLocation(IsoDate_Date, value, time.Local); err == nil {
+			// slog.Debug("matchXValue: Value is ISO date (only date part) string")
 			return date
 		}
 		if number, err := strconv.ParseFloat(value, 64); err == nil {
@@ -170,11 +180,13 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 	colorTheme := getStringFlag(call, "color-theme", charttypes.ThemeWesteros)
 	width := getIntFlag(call, "width", 1200)
 	height := getIntFlag(call, "height", 600)
+	fitted := getBoolFlag(call, "fitted")
 	slog.Debug("buildGlobalChartOptions", "title", title)
 	slog.Debug("buildGlobalChartOptions", "subtitle", subtitle)
 	slog.Debug("buildGlobalChartOptions", "color-theme", colorTheme)
 	slog.Debug("buildGlobalChartOptions", "width", width)
 	slog.Debug("buildGlobalChartOptions", "height", height)
+	slog.Debug("buildGlobalChartOptions", "fitted", fitted)
 
 	// If the given color theme is in the list of possible themes, we will
 	// enable it.
@@ -218,6 +230,12 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 		),
 		charts.WithDataZoomOpts(opts.DataZoom{
 			Type: "slider",
+		}),
+		charts.WithDataZoomOpts(opts.DataZoom{
+			Type: "inside",
+		}),
+		charts.WithYAxisOpts(opts.YAxis{
+			Scale: opts.Bool(fitted),
 		}),
 	}
 }
