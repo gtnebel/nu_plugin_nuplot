@@ -53,9 +53,12 @@ func NuplotKline() *nu.Command {
 		},
 		Examples: nu.Examples{
 			{
-				Description: `Plot a line graph of an array of numbers.`,
-				Example:     `[5, 4, 3, 2, 5, 7, 8] | nuplot line`,
-				// Result:      &nu.Value{Value: []nu.Value{{Value: 10}, {Value: "foo"}}},
+				Description: `Plot a kline graph of an array of array of numbers.`,
+				Example:     `[[1 4 0 6] [5 3 1 5] [2 7 2 7]] | nuplot kline`,
+			},
+			{
+				Description: `Plot a kline graph of a table with addidional date column.`,
+				Example:     `[[Date First Last Min Max]; ['2024-06-01' 1.53 1.64 1.50 1.66] ['2024-06-02' 1.63 1.73 1.61 1.75] ['2024-06-03' 1.72 1.57 1.52 1.77]] | nuplot kline --xaxis Date --title 'Fuel prices in June 24'`,
 			},
 		},
 		OnRun: nuplotKlineHandler,
@@ -66,8 +69,30 @@ func nuplotKlineHandler(ctx context.Context, call *nu.ExecCommand) error {
 	return handleCommandInput(call, plotKline)
 }
 
-func ValueToFloat64(value nu.Value) float64 error {
-	
+func ValueToFloat64(value nu.Value) (float64, error) {
+	switch v := value.Value.(type) {
+	case int64:
+		return float64(v), nil
+	case float64:
+		return v, nil
+	default:
+		return 0, fmt.Errorf("incompatible input type for ValueToFloat64(): %T", v)
+	}
+}
+
+func convertValueArray(arr []nu.Value) ([]float64, error) {
+	res := make([]float64, 0)
+
+	for _, item := range arr {
+		v, err := ValueToFloat64(item)
+		if err == nil {
+			res = append(res, v)
+		} else {
+			return []float64{}, fmt.Errorf("Input array contains invalid values: %s", err.Error())
+		}
+	}
+
+	return res, nil
 }
 
 func plotKline(input any, call *nu.ExecCommand) error {
@@ -80,24 +105,44 @@ func plotKline(input any, call *nu.ExecCommand) error {
 	case []nu.Value:
 		for _, item := range inputValue {
 			switch itemValue := item.Value.(type) {
-			case int64:
-				items := getSeries(series, DefaultSeries)
-				series[DefaultSeries] = append(items, opts.KlineData{Value: itemValue})
-			case float64:
-				items := getSeries(series, DefaultSeries)
-				series[DefaultSeries] = append(items, opts.KlineData{Value: itemValue})
 			case nu.Record:
+				var first float64 = 0
+				var last float64 = 0
+				var min float64 = 0
+				var max float64 = 0
+
+				var ok1 error = nil
+				var ok2 error = nil
+				var ok3 error = nil
+				var ok4 error = nil
+
 				for k, v := range itemValue {
 					if k == xAxisName {
 						continue
 					}
 
-					_, ok1 := v.Value.(int64)
-					_, ok2 := v.Value.(float64)
-					if ok1 || ok2 {
-						items := getSeries(series, k)
-						series[k] = append(items, opts.KlineData{Value: v.Value})
+					if k == "First" {
+						first, ok1 = ValueToFloat64(v)
 					}
+					if k == "Last" {
+						last, ok2 = ValueToFloat64(v)
+					}
+					if k == "Min" {
+						min, ok3 = ValueToFloat64(v)
+					}
+					if k == "Max" {
+						max, ok4 = ValueToFloat64(v)
+					}
+				}
+
+				if ok1 == nil && ok2 == nil && ok3 == nil && ok4 == nil {
+					items := getSeries(series, DefaultSeries)
+					series[DefaultSeries] = append(
+						items,
+						opts.KlineData{Value: [4]float64{first, last, min, max}},
+					)
+				} else {
+					return fmt.Errorf("Some values in the First, Last Min, Max columns contain invalid values.")
 				}
 
 				// If a xaxis is defined, fill the series with the values.
@@ -114,10 +159,13 @@ func plotKline(input any, call *nu.ExecCommand) error {
 				}
 			case []nu.Value:
 				if len(itemValue) == 4 {
-					items := getSeries(series, DefaultSeries)
-					series[DefaultSeries] = append(items, opts.KlineData{Value: [4]float64{
-						
-					}})
+					lst, err := convertValueArray(itemValue)
+					if err == nil {
+						items := getSeries(series, DefaultSeries)
+						series[DefaultSeries] = append(items, opts.KlineData{Value: lst})
+					} else {
+						return err
+					}
 				} else {
 					return fmt.Errorf(
 						"Sub lists in a <list<list<number>>> input have to have length of 4 elements.",
