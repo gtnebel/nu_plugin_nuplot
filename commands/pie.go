@@ -34,6 +34,7 @@ func NuplotPie() *nu.Command {
 				flags.Width,
 				flags.Height,
 				flags.ColorTheme,
+				flags.Verbose,
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Record(types.RecordDef{}), Out: types.Nothing()},
@@ -54,6 +55,7 @@ func NuplotPie() *nu.Command {
 }
 
 func nuplotPieHandler(ctx context.Context, call *nu.ExecCommand) error {
+	checkVerboseFlag(call)
 	return handleCommandInput(call, plotPie)
 }
 

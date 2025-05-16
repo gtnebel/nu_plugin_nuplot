@@ -7,6 +7,16 @@ import (
 )
 
 var (
+	Verbose = nu.Flag{
+		Long:     "verbose",
+		Short:    "v",
+		Shape:    nil,
+		Required: false,
+		Desc:     "Prints debug messages to the terminal.",
+		VarId:    0,
+		Default:  nil,
+	}
+
 	Title = nu.Flag{
 		Long:     "title",
 		Short:    "T",

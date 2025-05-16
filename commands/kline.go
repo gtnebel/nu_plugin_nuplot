@@ -36,6 +36,7 @@ func NuplotKline() *nu.Command {
 				flags.Height,
 				flags.ColorTheme,
 				flags.Fitted,
+				flags.Verbose,
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{
@@ -71,6 +72,7 @@ func NuplotKline() *nu.Command {
 }
 
 func nuplotKlineHandler(ctx context.Context, call *nu.ExecCommand) error {
+	checkVerboseFlag(call)
 	return handleCommandInput(call, plotKline)
 }
 

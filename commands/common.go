@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 	"github.com/pkg/browser"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
@@ -38,7 +39,7 @@ var Themes = []string{
 
 // Abstract data type so that [getSeries] can be called for all plot types.
 type ChartData interface {
-	float64 | opts.LineData | opts.BarData | opts.PieData | opts.BoxPlotData | opts.KlineData
+	float64 | []float64 | opts.LineData | opts.BarData | opts.PieData | opts.BoxPlotData | opts.KlineData
 }
 
 // Retrieves a series with the given name from the series map. If the given
@@ -125,6 +126,12 @@ func matchXValue(nuValue nu.Value) any {
 		return value
 	default:
 		return value
+	}
+}
+
+func checkVerboseFlag(call *nu.ExecCommand) {
+	if getBoolFlag(call, flags.Verbose.Long) {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 }
 

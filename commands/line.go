@@ -36,6 +36,7 @@ func NuplotLine() *nu.Command {
 				flags.Height,
 				flags.ColorTheme,
 				flags.Fitted,
+				flags.Verbose,
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Table(types.RecordDef{}), Out: types.Nothing()},
@@ -56,6 +57,7 @@ func NuplotLine() *nu.Command {
 }
 
 func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
+	checkVerboseFlag(call)
 	return handleCommandInput(call, plotLine)
 }
 

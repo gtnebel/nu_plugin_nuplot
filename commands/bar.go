@@ -37,6 +37,7 @@ func NuplotBar() *nu.Command {
 				flags.Width,
 				flags.Height,
 				flags.ColorTheme,
+				flags.Verbose,
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Table(types.RecordDef{}), Out: types.Nothing()},
@@ -57,6 +58,7 @@ func NuplotBar() *nu.Command {
 }
 
 func nuplotBarHandler(ctx context.Context, call *nu.ExecCommand) error {
+	checkVerboseFlag(call)
 	return handleCommandInput(call, plotBar)
 }
 
