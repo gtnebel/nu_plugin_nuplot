@@ -51,9 +51,12 @@ func NuplotBoxPlot() *nu.Command {
 		},
 		Examples: nu.Examples{
 			{
-				Description: `Plot a line graph of an array of numbers.`,
-				Example:     `[5, 4, 3, 2, 5, 7, 8] | nuplot line`,
-				// Result:      &nu.Value{Value: []nu.Value{{Value: 10}, {Value: "foo"}}},
+				Description: `Simple boxplot from an array of numbers.`,
+				Example:     `[5, 4, 3, 2, 5, 7, 8] | nuplot boxplot`,
+			},
+			{
+				Description: `Boxplot from a table with two columns.`,
+				Example:     `[[value1 value2]; [2 3] [3 5] [6 8] [1 8]] | nuplot boxplot`,
 			},
 		},
 		OnRun: nuplotBoxPlotHandler,
@@ -64,18 +67,17 @@ func nuplotBoxPlotHandler(ctx context.Context, call *nu.ExecCommand) error {
 	return handleCommandInput(call, plotBoxPlot)
 }
 
-func createBoxPlotDataValue(data []float64) []float64 {
+func createBoxPlotDataValue(data []float64) ([]float64, error) {
+	if len(data) == 0 {
+		return []float64{0, 0, 0, 0, 0},
+			fmt.Errorf("zero input data for createBoxPlotDataValue()")
+	}
+
 	min, _ := stats.Min(data)
 	max, _ := stats.Max(data)
 	q, _ := stats.Quartile(data)
 
-	return []float64{
-		min,
-		q.Q1,
-		q.Q2,
-		q.Q3,
-		max,
-	}
+	return []float64{min, q.Q1, q.Q2, q.Q3, max}, nil
 }
 
 func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisName string) error {
@@ -198,11 +200,16 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 
 		// itemCount = len(sValues)
 		// slog.Debug("plotBoxPlot: Adding items to series", "series", sName, "items", itemCount)
-		itemCount = 1
-		data := make(BoxPlotDataList, 1)
-		data[0] = opts.BoxPlotData{Value: createBoxPlotDataValue(sValues)}
+		bpValues, err := createBoxPlotDataValue(sValues)
+		if err == nil {
+			itemCount = 1
+			data := make(BoxPlotDataList, 1)
+			data[0] = opts.BoxPlotData{Value: bpValues}
 
-		boxplot = boxplot.AddSeries(sName, data)
+			boxplot = boxplot.AddSeries(sName, data)
+		} else {
+			slog.Debug(err.Error())
+		}
 	}
 
 	if xAxisName != XAxisSeries {
