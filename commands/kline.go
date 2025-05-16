@@ -35,6 +35,7 @@ func NuplotKline() *nu.Command {
 				flags.Width,
 				flags.Height,
 				flags.ColorTheme,
+				flags.Fitted,
 			},
 			InputOutputTypes: []nu.InOutTypes{
 				{
@@ -58,7 +59,11 @@ func NuplotKline() *nu.Command {
 			},
 			{
 				Description: `Plot a kline graph of a table with addidional date column.`,
-				Example:     `[[Date First Last Min Max]; ['2024-06-01' 1.53 1.64 1.50 1.66] ['2024-06-02' 1.63 1.73 1.61 1.75] ['2024-06-03' 1.72 1.57 1.52 1.77]] | nuplot kline --xaxis Date --title 'Fuel prices in June 24'`,
+				Example:     `[[Date First Last Min Max]; ['2024-06-01' 1.53 1.64 1.50 1.66] ['2024-06-02' 1.63 1.73 1.61 1.75] ['2024-06-03' 1.72 1.57 1.52 1.77]] | nuplot kline --xaxis Date --fitted --title 'Fuel prices in June 24'`,
+			},
+			{
+				Description: `Load data from a file and prepare it for the kline chart.`,
+				Example:     `open temperatures-2023.csv | chunk-by {|l| $l.date | into datetime | format date '%Y-%m-%d' } | each {|d| {Date: $d.0.date First: $d.0.value Last: ($d | last | get value) Min: ($d | get value | math min) Max: ($d | get value | math max)}} | nuplot kline --title "Temperatures 2023" --xaxis Date`,
 			},
 		},
 		OnRun: nuplotKlineHandler,
@@ -209,16 +214,6 @@ func plotKline(input any, call *nu.ExecCommand) error {
 
 		line = line.SetXAxis(xRange)
 	}
-
-	line.SetSeriesOptions(
-		charts.WithLineChartOpts(opts.LineChart{
-			Smooth: opts.Bool(true),
-		}),
-		// For bar charts
-		// charts.WithBarChartOpts(opts.BarChart{
-		// 	Stack: "stackA",
-		// }),
-	)
 
 	renderChart(func(f *os.File) error { return line.Render(f) })
 

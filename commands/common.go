@@ -170,11 +170,13 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 	colorTheme := getStringFlag(call, "color-theme", charttypes.ThemeWesteros)
 	width := getIntFlag(call, "width", 1200)
 	height := getIntFlag(call, "height", 600)
+	fitted := getBoolFlag(call, "fitted")
 	slog.Debug("buildGlobalChartOptions", "title", title)
 	slog.Debug("buildGlobalChartOptions", "subtitle", subtitle)
 	slog.Debug("buildGlobalChartOptions", "color-theme", colorTheme)
 	slog.Debug("buildGlobalChartOptions", "width", width)
 	slog.Debug("buildGlobalChartOptions", "height", height)
+	slog.Debug("buildGlobalChartOptions", "fitted", fitted)
 
 	// If the given color theme is in the list of possible themes, we will
 	// enable it.
@@ -218,6 +220,12 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 		),
 		charts.WithDataZoomOpts(opts.DataZoom{
 			Type: "slider",
+		}),
+		charts.WithDataZoomOpts(opts.DataZoom{
+			Type: "inside",
+		}),
+		charts.WithYAxisOpts(opts.YAxis{
+			Scale: opts.Bool(fitted),
 		}),
 	}
 }

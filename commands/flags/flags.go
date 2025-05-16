@@ -67,6 +67,16 @@ var (
 		// Default:  nil,
 	}
 
+	Fitted = nu.Flag{
+		Long:     "fitted",
+		Short:    "f",
+		Shape:    nil,
+		Required: false,
+		Desc:     "Removes zero offset from y-axis to fit values into chart area.",
+		VarId:    0,
+		Default:  nil,
+	}
+
 	Stacked = nu.Flag{
 		Long:     "stacked",
 		Short:    "s",
