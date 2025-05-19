@@ -100,7 +100,7 @@ func plotPie(input any, call *nu.ExecCommand) error {
 			// 		}
 			// 	}
 			default:
-				return fmt.Errorf("unsupported input value type: %T", inputValue)
+				return fmt.Errorf("plotPie: unsupported input value type: %T", inputValue)
 			}
 		}
 	case nu.Record:
@@ -113,7 +113,7 @@ func plotPie(input any, call *nu.ExecCommand) error {
 			}
 		}
 	default:
-		return fmt.Errorf("unsupported input value type: %T", inputValue)
+		return fmt.Errorf("plotPie: unsupported input value type: %T", inputValue)
 	}
 
 	// create a new pie instance

@@ -149,7 +149,7 @@ func plotKline(input any, call *nu.ExecCommand) error {
 						opts.KlineData{Value: [4]float64{first, last, min, max}},
 					)
 				} else {
-					return fmt.Errorf("Some values in the First, Last Min, Max columns contain invalid values.")
+					return fmt.Errorf("plotKline: Some values in the First, Last Min, Max columns contain invalid values.")
 				}
 
 				// If a xaxis is defined, fill the series with the values.
@@ -175,15 +175,15 @@ func plotKline(input any, call *nu.ExecCommand) error {
 					}
 				} else {
 					return fmt.Errorf(
-						"Sub lists in a <list<list<number>>> input have to have length of 4 elements.",
+						"plotKline: Sub lists in a <list<list<number>>> input have to have length of 4 elements.",
 					)
 				}
 			default:
-				return fmt.Errorf("unsupported input value type: %T", inputValue)
+				return fmt.Errorf("plotKline: unsupported input value type: %T", inputValue)
 			}
 		}
 	default:
-		return fmt.Errorf("unsupported input value type: %T", inputValue)
+		return fmt.Errorf("plotKline: unsupported input value type: %T", inputValue)
 	}
 
 	// create a new line instance

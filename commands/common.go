@@ -122,7 +122,7 @@ func matchXValue(nuValue nu.Value) any {
 			return number
 		}
 
-		slog.Warn("matchXValue: Value is unknown string", "value", value)
+		slog.Debug("matchXValue: Value is unknown string", "value", value)
 		return value
 	default:
 		return value

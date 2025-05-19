@@ -104,11 +104,11 @@ func plotLine(input any, call *nu.ExecCommand) error {
 					}
 				}
 			default:
-				return fmt.Errorf("unsupported input value type: %T", inputValue)
+				return fmt.Errorf("plotLine: unsupported input value type: %T", inputValue)
 			}
 		}
 	default:
-		return fmt.Errorf("unsupported input value type: %T", inputValue)
+		return fmt.Errorf("plotLine: unsupported input value type: %T", inputValue)
 	}
 
 	// create a new line instance

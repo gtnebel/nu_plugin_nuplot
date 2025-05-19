@@ -74,7 +74,7 @@ func nuplotBoxPlotHandler(ctx context.Context, call *nu.ExecCommand) error {
 func createBoxPlotDataValue(data []float64) ([]float64, error) {
 	if len(data) == 0 {
 		return []float64{0, 0, 0, 0, 0},
-			fmt.Errorf("zero input data for createBoxPlotDataValue()")
+			fmt.Errorf("createBoxPlotDataValue: zero input data")
 	}
 
 	min, _ := stats.Min(data)
@@ -84,7 +84,7 @@ func createBoxPlotDataValue(data []float64) ([]float64, error) {
 	return []float64{min, q.Q1, q.Q2, q.Q3, max}, nil
 }
 
-func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisName string) error {
+func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisName string) (xValue any, res error) {
 	series := make(Float64Series)
 
 	for _, item := range table {
@@ -112,23 +112,40 @@ func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisNam
 					series[k] = append(items, vValue)
 				}
 			}
-			// // If a xaxis is defined, fill the series with the values.
-			// if xAxisName != XAxisSeries {
-			// 	if v, ok := itemValue[xAxisName]; ok {
-			// 		items := getSeries(series, xAxisName)
-			// 		series[xAxisName] = append(items, opts.BoxPlotData{Value: matchXValue(v)})
-			// 	} else {
-			// 		// If the column specified in --xaxis does not exist, we
-			// 		// set the `xAxisName` variable to XAxisSeries, so that a
-			// 		// simple int range is generated as x axis.
-			// 		xAxisName = XAxisSeries
-			// 	}
-			// }
+			// If a xaxis is defined, fill the series with the values.
+			if xAxisName != XAxisSeries {
+				if v, ok := itemValue[xAxisName]; ok {
+					// Only the first Item in the sub-table is as x value for
+					// this sub-table
+					if xValue == nil {
+						xValue = matchXValue(v)
+					}
+				} else {
+					// If the column specified in --xaxis does not exist, we
+					// set the `xAxisName` variable to XAxisSeries, so that a
+					// simple int range is generated as x axis.
+					xAxisName = XAxisSeries
+				}
+			}
 		case []nu.Value:
 			// The input value is a list of tables
-			readTableValue(itemValue, seriesHelper, xAxisName)
+			xv, err := readTableValue(itemValue, seriesHelper, xAxisName)
+			if err == nil {
+				if xValue == nil {
+					xValue = make([]any, 0)
+				}
+
+				switch items := xValue.(type) {
+				case []any:
+					xValue = append(items, xv)
+				}
+			} else {
+				res = err
+				return
+			}
 		default:
-			return fmt.Errorf("unsupported input value type: %T", table)
+			res = fmt.Errorf("readTableValue: unsupported input value type: %T", table)
+			return
 		}
 	}
 
@@ -137,21 +154,29 @@ func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisNam
 		seriesHelper[k] = append(items, v)
 	}
 
-	return nil
+	return
 }
 
 func plotBoxPlot(input any, call *nu.ExecCommand) error {
 	seriesHelper := make(BoxPlotSeriesHelper)
-	series := make(BoxPlotDataSeries)
+	var xSeries []any = nil
 
 	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
 	slog.Debug("plotBoxPlot", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
-		readTableValue(inputValue, seriesHelper, xAxisName)
+		xValue, err := readTableValue(inputValue, seriesHelper, xAxisName)
+		if err == nil {
+			switch items := xValue.(type) {
+			case []any:
+				xSeries = items
+			}
+		} else {
+			return err
+		}
 	default:
-		return fmt.Errorf("unsupported input value type: %T", inputValue)
+		return fmt.Errorf("plotBoxPlot: unsupported input value type: %T", inputValue)
 	}
 
 	// create a new boxplot instance
@@ -163,6 +188,20 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 	itemCount := 0
 	for sName, sValues := range seriesHelper {
 		if sName == xAxisName {
+			continue
+		}
+
+		// Check, if series is completely empty. In this case, no box plot
+		// data is created for it.
+		empty := true
+		for _, sVal := range sValues {
+			if len(sVal) > 0 {
+				empty = false
+				break
+			}
+		}
+		if empty {
+			slog.Debug("plotBoxPlot: Skipping empty series", "series", sName)
 			continue
 		}
 
@@ -183,7 +222,8 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 	}
 
 	if xAxisName != XAxisSeries {
-		boxplot = boxplot.SetXAxis(series[xAxisName])
+		slog.Debug("Setting x axis to", "series", xAxisName)
+		boxplot = boxplot.SetXAxis(xSeries)
 	} else {
 		xRange := make([]int, itemCount)
 		for i := range itemCount {
