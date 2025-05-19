@@ -61,6 +61,10 @@ func NuplotBoxPlot() *nu.Command {
 				Description: `Boxplot from a table with two columns.`,
 				Example:     `[[value1 value2]; [2 3] [3 5] [6 8] [1 8]] | nuplot boxplot`,
 			},
+			{
+				Description: `Make a boxplot of monthly values.`,
+				Example:     `open Temperatures.csv | upsert date {|l| $l.date | format date "%B"} | chunk-by {$in.date} | nuplot boxplot --xaxis date`,
+			},
 		},
 		OnRun: nuplotBoxPlotHandler,
 	}
