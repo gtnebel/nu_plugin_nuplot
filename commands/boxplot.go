@@ -30,7 +30,7 @@ func NuplotBoxPlot() *nu.Command {
 		Signature: nu.PluginSignature{
 			Name:        "nuplot boxplot",
 			Category:    "Chart",
-			Desc:        "Plots the data that is piped into the command as `echarts` graph.",
+			Desc:        "Plots a boxplot chart",
 			Description: "Title, size and color theme can be configured by flags. Each column that contains numbers will be plottet. The X axis can be set by means of the --xaxis flag.",
 			SearchTerms: []string{"plot", "graph", "boxplot"},
 			// OptionalPositional: nu.PositionalArgs{},

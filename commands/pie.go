@@ -24,7 +24,7 @@ func NuplotPie() *nu.Command {
 		Signature: nu.PluginSignature{
 			Name:        "nuplot pie",
 			Category:    "Chart",
-			Desc:        "Plots the data that is piped into the command as pi chart.",
+			Desc:        "Plots a pie chart.",
 			Description: "Title, size and color theme can be configured by flags. Each column that contains numbers will be plottet. The X axis can be set by means of the --xaxis flag.",
 			SearchTerms: []string{"plot", "graph", "pie"},
 			// OptionalPositional: nu.PositionalArgs{},
