@@ -217,7 +217,5 @@ func plotKline(input any, call *nu.ExecCommand) error {
 		line = line.SetXAxis(xRange)
 	}
 
-	renderChart(func(f *os.File) error { return line.Render(f) })
-
-	return nil
+	return renderChart(func(f *os.File) error { return line.Render(f) })
 }

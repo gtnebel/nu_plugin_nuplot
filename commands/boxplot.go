@@ -237,7 +237,5 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 		boxplot = boxplot.SetXAxis(xRange)
 	}
 
-	renderChart(func(f *os.File) error { return boxplot.Render(f) })
-
-	return nil
+	return renderChart(func(f *os.File) error { return boxplot.Render(f) })
 }

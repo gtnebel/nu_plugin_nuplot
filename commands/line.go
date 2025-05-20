@@ -152,7 +152,5 @@ func plotLine(input any, call *nu.ExecCommand) error {
 		// }),
 	)
 
-	renderChart(func(f *os.File) error { return line.Render(f) })
-
-	return nil
+	return renderChart(func(f *os.File) error { return line.Render(f) })
 }

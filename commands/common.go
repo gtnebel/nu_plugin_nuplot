@@ -250,12 +250,16 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 // Helper function that wraps the creation of the temporary file the chart is
 // saved into and than opening the file in the web browser. The renderHandler
 // function performs the actual plotting of the chart.
-func renderChart(renderHandler func(f *os.File) error) {
+func renderChart(renderHandler func(f *os.File) error) error {
 	chartFile, _ := os.CreateTemp("", "chart-*.html")
 	chartFileName := chartFile.Name()
 	slog.Debug("plotLine: Rendering output", "filename", chartFileName)
-	renderHandler(chartFile) // TODO: handle errors
-	chartFile.Close()
+	err := renderHandler(chartFile)
+	defer chartFile.Close()
 
-	browser.OpenFile(chartFileName)
+	if err == nil {
+		browser.OpenFile(chartFileName)
+	}
+
+	return err
 }
