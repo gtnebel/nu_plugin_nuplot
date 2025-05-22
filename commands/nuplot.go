@@ -2,6 +2,8 @@ package commands
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/ainvaltin/nu-plugin"
 	"github.com/ainvaltin/nu-plugin/types"
@@ -28,7 +30,7 @@ func Nuplot() *nu.Command {
 
 func nuplotHandler(ctx context.Context, call *nu.ExecCommand) error {
 	h, _ := call.GetHelp(ctx)
-	println(h)
+	fmt.Fprintln(os.Stderr, h)
 
 	return nil
 }
