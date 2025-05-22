@@ -42,6 +42,19 @@ recognized correctly.
 
 ![Weather forcast (1)](https://github.com/user-attachments/assets/0674aa72-37e9-4868-a156-31cf990fbde9)
 
+#### Show the average monthly temperatures as a boxplot chart
+
+```nushell
+http get https://bulk.meteostat.net/v2/hourly/2024/10389.csv.gz
+| gunzip
+| from csv --noheaders
+| select column0 column2
+| rename date temperature
+| upsert date {|l| $l.date | format date "%B"}
+| chunk-by {$in.date}
+| nuplot boxplot --xaxis date --title "Average monthly temperatures for 2024 in Berlin"
+```
+
 ## Build and install
 
 **Prerequisits:** You will need the Go compiler to build the project.
