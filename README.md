@@ -55,6 +55,8 @@ http get https://bulk.meteostat.net/v2/hourly/2024/10389.csv.gz
 | nuplot boxplot --xaxis date --title "Average monthly temperatures for 2024 in Berlin"
 ```
 
+![image](https://github.com/user-attachments/assets/760d626b-44c0-4979-88da-e20a4946a79c)
+
 ## Build and install
 
 **Prerequisits:** You will need the Go compiler to build the project.
