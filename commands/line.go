@@ -64,7 +64,7 @@ func nuplotLineHandler(ctx context.Context, call *nu.ExecCommand) error {
 func plotLine(input any, call *nu.ExecCommand) error {
 	series := make(LineDataSeries)
 
-	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
+	xAxisName := getCellPathFlag(call, "xaxis", XAxisSeries)
 	slog.Debug("plotLine", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {

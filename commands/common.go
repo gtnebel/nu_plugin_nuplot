@@ -68,6 +68,24 @@ func getStringFlag(call *nu.ExecCommand, name string, deflt string) string {
 	}
 }
 
+// Retrieve the CellPath value of a flag from the call. The name of the flag and
+// a default value has to be provided.
+//
+// This function returns the string representation of the cell path. Chained
+// cell paths will be returned in "a.b" syntax.
+//
+// NOTE: Chained cell paths are not yet supported in the plotting commands.
+func getCellPathFlag(call *nu.ExecCommand, name string, deflt string) string {
+	value, _ := call.FlagValue(name)
+
+	if value.Value != nil {
+		path := value.Value.(nu.CellPath)
+		return path.String()
+	} else {
+		return deflt
+	}
+}
+
 // Retrieve the int64 value of a flag from the call. The name of the flag and
 // a default value has to be provided.
 func getIntFlag(call *nu.ExecCommand, name string, deflt int64) int64 {

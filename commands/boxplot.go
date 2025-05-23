@@ -165,7 +165,7 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 	seriesHelper := make(BoxPlotSeriesHelper)
 	var xSeries []any = nil
 
-	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
+	xAxisName := getCellPathFlag(call, "xaxis", XAxisSeries)
 	slog.Debug("plotBoxPlot", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {

@@ -70,7 +70,7 @@ var (
 	XAxis = nu.Flag{
 		Long:     "xaxis",
 		Short:    'x',
-		Shape:    syntaxshape.String(), // TODO: CellPath not supported...
+		Shape:    syntaxshape.CellPath(),
 		Required: false,
 		Desc:     "Only if input is a table: the column name wich holds the values for the x-axis",
 		VarId:    0,

@@ -65,7 +65,7 @@ func nuplotBarHandler(ctx context.Context, call *nu.ExecCommand) error {
 func plotBar(input any, call *nu.ExecCommand) error {
 	series := make(BarDataSeries)
 
-	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
+	xAxisName := getCellPathFlag(call, "xaxis", XAxisSeries)
 	slog.Debug("plotBar", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {

@@ -105,7 +105,7 @@ func convertValueArray(arr []nu.Value) ([]float64, error) {
 func plotKline(input any, call *nu.ExecCommand) error {
 	series := make(KlineDataSeries)
 
-	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
+	xAxisName := getCellPathFlag(call, "xaxis", XAxisSeries)
 	slog.Debug("plotKline", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {
