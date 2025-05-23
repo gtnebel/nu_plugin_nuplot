@@ -17,13 +17,13 @@ func Nuplot() *nu.Command {
 			Desc:        "nuplot is a nushell plugin for plotting charts. It builds interactive charts from your data that are opened inside the web browser.",
 			Description: "You must use one of the following subcommands. Using this command as-is will only produce this help message.",
 			SearchTerms: []string{"plot", "graph"},
-			Named:       nu.Flags{},
+			Named:       []nu.Flag{},
 			InputOutputTypes: []nu.InOutTypes{
 				{In: types.Nothing(), Out: types.Nothing()},
 			},
 			AllowMissingExamples: true,
 		},
-		Examples: nu.Examples{},
+		Examples: []nu.Example{},
 		OnRun:    nuplotHandler,
 	}
 }

@@ -28,7 +28,7 @@ func NuplotBar() *nu.Command {
 			Description: "Title, size and color theme can be configured by flags. Each column that contains numbers will be plottet. The X axis can be set by means of the --xaxis flag.",
 			SearchTerms: []string{"plot", "graph", "bar"},
 			// OptionalPositional: nu.PositionalArgs{},
-			Named: nu.Flags{
+			Named: []nu.Flag{
 				flags.XAxis,
 				flags.XYReverse,
 				flags.Stacked,
@@ -46,7 +46,7 @@ func NuplotBar() *nu.Command {
 			},
 			AllowMissingExamples: true,
 		},
-		Examples: nu.Examples{
+		Examples: []nu.Example{
 			{
 				Description: `Plot a bar graph of an array of numbers.`,
 				Example:     `[5, 4, 3, 2, 5, 7, 8] | nuplot bar`,

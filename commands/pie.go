@@ -28,7 +28,7 @@ func NuplotPie() *nu.Command {
 			Description: "Title, size and color theme can be configured by flags. Each column that contains numbers will be plottet. The X axis can be set by means of the --xaxis flag.",
 			SearchTerms: []string{"plot", "graph", "pie"},
 			// OptionalPositional: nu.PositionalArgs{},
-			Named: nu.Flags{
+			Named: []nu.Flag{
 				flags.Title,
 				flags.SubTitle,
 				flags.Width,
@@ -42,7 +42,7 @@ func NuplotPie() *nu.Command {
 			},
 			AllowMissingExamples: true,
 		},
-		Examples: nu.Examples{
+		Examples: []nu.Example{
 			{
 				Description: `Plot a pie graph of an array of numbers.`,
 				Example:     `{'apples': 7 'oranges': 5 'bananas': 3} | nuplot pie --title "Fruits"`,

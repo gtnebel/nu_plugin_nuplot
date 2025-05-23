@@ -28,7 +28,7 @@ func NuplotKline() *nu.Command {
 			Description: "Title, size and color theme can be configured by flags. Each column that contains numbers will be plottet. The X axis can be set by means of the --xaxis flag.",
 			SearchTerms: []string{"plot", "graph", "kline"},
 			// OptionalPositional: nu.PositionalArgs{},
-			Named: nu.Flags{
+			Named: []nu.Flag{
 				flags.XAxis,
 				flags.Title,
 				flags.SubTitle,
@@ -53,7 +53,7 @@ func NuplotKline() *nu.Command {
 			},
 			AllowMissingExamples: true,
 		},
-		Examples: nu.Examples{
+		Examples: []nu.Example{
 			{
 				Description: `Plot a kline graph of an array of array of numbers.`,
 				Example:     `[[1 4 0 6] [5 3 1 5] [2 7 2 7]] | nuplot kline`,

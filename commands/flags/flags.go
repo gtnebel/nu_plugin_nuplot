@@ -9,7 +9,7 @@ import (
 var (
 	Verbose = nu.Flag{
 		Long:     "verbose",
-		Short:    "v",
+		Short:    'v',
 		Shape:    nil,
 		Required: false,
 		Desc:     "Prints debug messages to the terminal.",
@@ -19,7 +19,7 @@ var (
 
 	Title = nu.Flag{
 		Long:     "title",
-		Short:    "T",
+		Short:    'T',
 		Shape:    syntaxshape.String(),
 		Required: false,
 		Desc:     "The chart title",
@@ -29,7 +29,7 @@ var (
 
 	SubTitle = nu.Flag{
 		Long:     "subtitle",
-		Short:    "S",
+		Short:    'S',
 		Shape:    syntaxshape.String(),
 		Required: false,
 		Desc:     "The chart subtitle",
@@ -39,7 +39,7 @@ var (
 
 	Width = nu.Flag{
 		Long:     "width",
-		Short:    "W",
+		Short:    'W',
 		Shape:    syntaxshape.Int(),
 		Required: false,
 		Desc:     "Width of chart in pixels",
@@ -49,7 +49,7 @@ var (
 
 	Height = nu.Flag{
 		Long:     "height",
-		Short:    "H",
+		Short:    'H',
 		Shape:    syntaxshape.Int(),
 		Required: false,
 		Desc:     "Height of chart in pixels",
@@ -59,7 +59,7 @@ var (
 
 	ColorTheme = nu.Flag{
 		Long:     "color-theme",
-		Short:    "C",
+		Short:    'C',
 		Shape:    syntaxshape.String(),
 		Required: false,
 		Desc:     "One of: chalk, essos, infographic, macarons, purple-passion, roma, romantic, shine, vintage, walden, westeros, wonderland,",
@@ -69,7 +69,7 @@ var (
 
 	XAxis = nu.Flag{
 		Long:     "xaxis",
-		Short:    "x",
+		Short:    'x',
 		Shape:    syntaxshape.String(), // TODO: CellPath not supported...
 		Required: false,
 		Desc:     "Only if input is a table: the column name wich holds the values for the x-axis",
@@ -79,7 +79,7 @@ var (
 
 	Fitted = nu.Flag{
 		Long:     "fitted",
-		Short:    "f",
+		Short:    'f',
 		Shape:    nil,
 		Required: false,
 		Desc:     "Removes zero offset from y-axis to fit values into chart area.",
@@ -89,7 +89,7 @@ var (
 
 	Stacked = nu.Flag{
 		Long:     "stacked",
-		Short:    "s",
+		Short:    's',
 		Shape:    nil,
 		Required: false,
 		Desc:     "Plots data series as stacked bar chart.",
@@ -99,7 +99,7 @@ var (
 
 	XYReverse = nu.Flag{
 		Long:     "xyreverse",
-		Short:    "r",
+		Short:    'r',
 		Shape:    nil,
 		Required: false,
 		Desc:     "Reverse the x and y axes",
