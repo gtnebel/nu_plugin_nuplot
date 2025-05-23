@@ -88,10 +88,10 @@ func createBoxPlotDataValue(data []float64) ([]float64, error) {
 	return []float64{min, q.Q1, q.Q2, q.Q3, max}, nil
 }
 
-func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisName string) (xValue any, res error) {
+func boxplotReadInputListItem(listItem []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisName string) (xValue any, res error) {
 	series := make(Float64Series)
 
-	for _, item := range table {
+	for _, item := range listItem {
 		switch itemValue := item.Value.(type) {
 		case int64:
 			// items := getSeries(seriesHelper, DefaultSeries)
@@ -132,8 +132,8 @@ func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisNam
 				}
 			}
 		case []nu.Value:
-			// The input value is a list of tables
-			xv, err := readTableValue(itemValue, seriesHelper, xAxisName)
+			// The input value is a list of tables or list of lists
+			xv, err := boxplotReadInputListItem(itemValue, seriesHelper, xAxisName)
 			if err == nil {
 				if xValue == nil {
 					xValue = make([]any, 0)
@@ -148,7 +148,7 @@ func readTableValue(table []nu.Value, seriesHelper BoxPlotSeriesHelper, xAxisNam
 				return
 			}
 		default:
-			res = fmt.Errorf("readTableValue: unsupported input value type: %T", table)
+			res = fmt.Errorf("readTableValue: unsupported input value type: %T", listItem)
 			return
 		}
 	}
@@ -170,7 +170,7 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
-		xValue, err := readTableValue(inputValue, seriesHelper, xAxisName)
+		xValue, err := boxplotReadInputListItem(inputValue, seriesHelper, xAxisName)
 		if err == nil {
 			switch items := xValue.(type) {
 			case []any:

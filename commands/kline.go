@@ -12,6 +12,8 @@ import (
 	"github.com/ainvaltin/nu-plugin"
 	"github.com/ainvaltin/nu-plugin/types"
 
+	"github.com/montanaflynn/stats"
+
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
@@ -39,16 +41,7 @@ func NuplotKline() *nu.Command {
 				flags.Verbose,
 			},
 			InputOutputTypes: []nu.InOutTypes{
-				{
-					In: types.Table(types.RecordDef{
-						"First": types.Number(),
-						"Last":  types.Number(),
-						"Min":   types.Number(),
-						"Max":   types.Number(),
-					}),
-					Out: types.Nothing(),
-				},
-				// Array List of 4-element Lists with [first, last, min, max] values.
+				{In: types.List(types.Table(types.RecordDef{})), Out: types.Nothing()},
 				{In: types.List(types.List(types.Number())), Out: types.Nothing()},
 			},
 			AllowMissingExamples: true,
@@ -56,15 +49,15 @@ func NuplotKline() *nu.Command {
 		Examples: []nu.Example{
 			{
 				Description: `Plot a kline graph of an array of array of numbers.`,
-				Example:     `[[1 4 0 6] [5 3 1 5] [2 7 2 7]] | nuplot kline`,
+				Example:     `[[1 4 0 6] [5 3 1 4] [2 7 2 7]] | nuplot kline`,
 			},
+			// {
+			// 	Description: `Plot a kline graph of a table with addidional date column.`,
+			// 	Example:     `[[Date First Last Min Max]; ['2024-06-01' 1.53 1.64 1.50 1.66] ['2024-06-02' 1.63 1.73 1.61 1.75] ['2024-06-03' 1.72 1.57 1.52 1.77]] | nuplot kline --xaxis Date --fitted --title 'Fuel prices in June 24'`,
+			// },
 			{
-				Description: `Plot a kline graph of a table with addidional date column.`,
-				Example:     `[[Date First Last Min Max]; ['2024-06-01' 1.53 1.64 1.50 1.66] ['2024-06-02' 1.63 1.73 1.61 1.75] ['2024-06-03' 1.72 1.57 1.52 1.77]] | nuplot kline --xaxis Date --fitted --title 'Fuel prices in June 24'`,
-			},
-			{
-				Description: `Load data from a file and prepare it for the kline chart.`,
-				Example:     `open temperatures-2023.csv | chunk-by {|l| $l.date | into datetime | format date '%Y-%m-%d' } | each {|d| {Date: $d.0.date First: $d.0.value Last: ($d | last | get value) Min: ($d | get value | math min) Max: ($d | get value | math max)}} | nuplot kline --title "Temperatures 2023" --xaxis Date`,
+				Description: `Load data from a file and display kline chart.`,
+				Example:     `http get https://bulk.meteostat.net/v2/hourly/2023/10577.csv.gz | gunzip | from csv --noheaders | select column0 column2 | rename date temp | upsert date {|l| $l.date | into datetime | format date "%B"} | chunk-by {$in.date} | nuplot kline --xaxis date`,
 			},
 		},
 		OnRun: nuplotKlineHandler,
@@ -74,6 +67,22 @@ func NuplotKline() *nu.Command {
 func nuplotKlineHandler(ctx context.Context, call *nu.ExecCommand) error {
 	checkVerboseFlag(call)
 	return handleCommandInput(call, plotKline)
+}
+
+func buildKlineDataValue(data []float64) opts.KlineData {
+	if len(data) == 0 {
+		return opts.KlineData{Value: [4]float64{0, 0, 0, 0}}
+	}
+
+	min, _ := stats.Min(data)
+	max, _ := stats.Max(data)
+
+	return opts.KlineData{Value: [4]float64{
+		data[0],
+		data[len(data)-1],
+		min,
+		max,
+	}}
 }
 
 func ValueToFloat64(value nu.Value) (float64, error) {
@@ -87,100 +96,107 @@ func ValueToFloat64(value nu.Value) (float64, error) {
 	}
 }
 
-func convertValueArray(arr []nu.Value) ([]float64, error) {
-	res := make([]float64, 0)
+// func convertValueArray(arr []nu.Value) ([]float64, error) {
+// 	res := make([]float64, 0)
 
-	for _, item := range arr {
-		v, err := ValueToFloat64(item)
-		if err == nil {
-			res = append(res, v)
-		} else {
-			return []float64{}, fmt.Errorf("Input array contains invalid values: %s", err.Error())
+// 	for _, item := range arr {
+// 		v, err := ValueToFloat64(item)
+// 		if err == nil {
+// 			res = append(res, v)
+// 		} else {
+// 			return []float64{}, fmt.Errorf("Input array contains invalid values: %s", err.Error())
+// 		}
+// 	}
+
+// 	return res, nil
+// }
+
+func klineReadInputListItem(listItem []nu.Value, klineSeries KlineDataSeries, xAxisName string) (xValue any, res error) {
+	series := make(Float64Series)
+
+	for _, item := range listItem {
+		switch itemValue := item.Value.(type) {
+		case int64:
+			// items := getSeries(seriesHelper, DefaultSeries)
+			items := getSeries(series, DefaultSeries)
+			series[DefaultSeries] = append(items, float64(itemValue))
+		case float64:
+			// items := getSeries(seriesHelper, DefaultSeries)
+			items := getSeries(series, DefaultSeries)
+			series[DefaultSeries] = append(items, itemValue)
+		case nu.Record:
+			for k, v := range itemValue {
+				if k == xAxisName {
+					continue
+				}
+
+				items := getSeries(series, k)
+				if float64Val, err := ValueToFloat64(v); err == nil {
+					series[k] = append(items, float64Val)
+				}
+			}
+			// If a xaxis is defined, fill the series with the values.
+			if xAxisName != XAxisSeries {
+				if v, ok := itemValue[xAxisName]; ok {
+					// Only the first Item in the sub-table is as x value for
+					// this sub-table
+					if xValue == nil {
+						xValue = matchXValue(v)
+					}
+				} else {
+					// If the column specified in --xaxis does not exist, we
+					// set the `xAxisName` variable to XAxisSeries, so that a
+					// simple int range is generated as x axis.
+					xAxisName = XAxisSeries
+				}
+			}
+		case []nu.Value:
+			// The input value is a list of tables or list of lists
+			xv, err := klineReadInputListItem(itemValue, klineSeries, xAxisName)
+			if err == nil {
+				if xValue == nil {
+					xValue = make([]any, 0)
+				}
+
+				switch items := xValue.(type) {
+				case []any:
+					xValue = append(items, xv)
+				}
+			} else {
+				res = err
+				return
+			}
+		default:
+			res = fmt.Errorf("readTableValue: unsupported input value type: %T", listItem)
+			return
 		}
 	}
 
-	return res, nil
+	for k, v := range series {
+		items := getSeries(klineSeries, k)
+		klineSeries[k] = append(items, buildKlineDataValue(v))
+	}
+
+	return
 }
 
 func plotKline(input any, call *nu.ExecCommand) error {
 	series := make(KlineDataSeries)
+	var xSeries []any = nil
 
 	xAxisName := getCellPathFlag(call, "xaxis", XAxisSeries)
 	slog.Debug("plotKline", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
-		for _, item := range inputValue {
-			switch itemValue := item.Value.(type) {
-			case nu.Record:
-				var first float64 = 0
-				var last float64 = 0
-				var min float64 = 0
-				var max float64 = 0
-
-				var ok1 error = nil
-				var ok2 error = nil
-				var ok3 error = nil
-				var ok4 error = nil
-
-				for k, v := range itemValue {
-					if k == xAxisName {
-						continue
-					}
-
-					if k == "First" {
-						first, ok1 = ValueToFloat64(v)
-					}
-					if k == "Last" {
-						last, ok2 = ValueToFloat64(v)
-					}
-					if k == "Min" {
-						min, ok3 = ValueToFloat64(v)
-					}
-					if k == "Max" {
-						max, ok4 = ValueToFloat64(v)
-					}
-				}
-
-				if ok1 == nil && ok2 == nil && ok3 == nil && ok4 == nil {
-					items := getSeries(series, DefaultSeries)
-					series[DefaultSeries] = append(
-						items,
-						opts.KlineData{Value: [4]float64{first, last, min, max}},
-					)
-				} else {
-					return fmt.Errorf("plotKline: Some values in the First, Last Min, Max columns contain invalid values.")
-				}
-
-				// If a xaxis is defined, fill the series with the values.
-				if xAxisName != XAxisSeries {
-					if v, ok := itemValue[xAxisName]; ok {
-						items := getSeries(series, xAxisName)
-						series[xAxisName] = append(items, opts.KlineData{Value: matchXValue(v)})
-					} else {
-						// If the column specified in --xaxis does not exist, we
-						// set the `xAxisName` variable to XAxisSeries, so that a
-						// simple int range is generated as x axis.
-						xAxisName = XAxisSeries
-					}
-				}
-			case []nu.Value:
-				if len(itemValue) == 4 {
-					lst, err := convertValueArray(itemValue)
-					if err == nil {
-						items := getSeries(series, DefaultSeries)
-						series[DefaultSeries] = append(items, opts.KlineData{Value: lst})
-					} else {
-						return err
-					}
-				} else {
-					return fmt.Errorf(
-						"plotKline: Sub lists in a <list<list<number>>> input have to have length of 4 elements.",
-					)
-				}
-			default:
-				return fmt.Errorf("plotKline: unsupported input value type: %T", inputValue)
+		xValue, err := klineReadInputListItem(inputValue, series, xAxisName)
+		if err == nil {
+			switch items := xValue.(type) {
+			case []any:
+				xSeries = items
 			}
+		} else {
+			return err
 		}
 	default:
 		return fmt.Errorf("plotKline: unsupported input value type: %T", inputValue)
@@ -190,9 +206,6 @@ func plotKline(input any, call *nu.ExecCommand) error {
 	line := charts.NewKLine()
 
 	line.SetGlobalOptions(buildGlobalChartOptions(call)...)
-
-	// Reverse X/Y (only on bar charts)
-	// line.XYReversal()
 
 	// Put data into instance
 	itemCount := 0
@@ -207,7 +220,7 @@ func plotKline(input any, call *nu.ExecCommand) error {
 	}
 
 	if xAxisName != XAxisSeries {
-		line = line.SetXAxis(series[xAxisName])
+		line = line.SetXAxis(xSeries)
 	} else {
 		xRange := make([]int, itemCount)
 		for i := range itemCount {
