@@ -85,17 +85,6 @@ func buildKlineDataValue(data []float64) opts.KlineData {
 	}}
 }
 
-func ValueToFloat64(value nu.Value) (float64, error) {
-	switch v := value.Value.(type) {
-	case int64:
-		return float64(v), nil
-	case float64:
-		return v, nil
-	default:
-		return 0, fmt.Errorf("incompatible input type for ValueToFloat64(): %T", v)
-	}
-}
-
 // func convertValueArray(arr []nu.Value) ([]float64, error) {
 // 	res := make([]float64, 0)
 
@@ -167,7 +156,7 @@ func klineReadInputListItem(listItem []nu.Value, klineSeries KlineDataSeries, xA
 				return
 			}
 		default:
-			res = fmt.Errorf("readTableValue: unsupported input value type: %T", listItem)
+			res = fmt.Errorf("klineReadInputListItem: unsupported input value type: %T", listItem)
 			return
 		}
 	}

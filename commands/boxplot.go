@@ -108,12 +108,8 @@ func boxplotReadInputListItem(listItem []nu.Value, seriesHelper BoxPlotSeriesHel
 				}
 
 				items := getSeries(series, k)
-
-				switch vValue := v.Value.(type) {
-				case int64:
-					series[k] = append(items, float64(vValue))
-				case float64:
-					series[k] = append(items, vValue)
+				if float64Val, err := ValueToFloat64(v); err == nil {
+					series[k] = append(items, float64Val)
 				}
 			}
 			// If a xaxis is defined, fill the series with the values.
@@ -148,7 +144,7 @@ func boxplotReadInputListItem(listItem []nu.Value, seriesHelper BoxPlotSeriesHel
 				return
 			}
 		default:
-			res = fmt.Errorf("readTableValue: unsupported input value type: %T", listItem)
+			res = fmt.Errorf("boxplotReadInputListItem: unsupported input value type: %T", listItem)
 			return
 		}
 	}

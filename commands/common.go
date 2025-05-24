@@ -109,6 +109,17 @@ func getBoolFlag(call *nu.ExecCommand, name string) bool {
 	}
 }
 
+func ValueToFloat64(value nu.Value) (float64, error) {
+	switch v := value.Value.(type) {
+	case int64:
+		return float64(v), nil
+	case float64:
+		return v, nil
+	default:
+		return 0, fmt.Errorf("incompatible input type for ValueToFloat64(): %T", v)
+	}
+}
+
 // Tries to parse the xaxis values into [time.Time] or [float]. This is useful
 // when data is loaded from CSV or JSON files, where dates and numbers are
 // sometimes represented as strings.
