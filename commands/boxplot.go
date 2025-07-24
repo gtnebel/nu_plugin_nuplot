@@ -213,7 +213,7 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 		itemCount = len(sValues)
 		slog.Debug("plotBoxPlot: Adding items to series", "series", sName, "items", itemCount)
 
-		d used in the plotting functionsata := make(BoxPlotDataList, 0)
+		data := make(BoxPlotDataList, 0)
 		for _, sVal := range sValues {
 			bpValues, err := createBoxPlotDataValue(sVal)
 			if err == nil {
