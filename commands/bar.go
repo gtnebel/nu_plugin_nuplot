@@ -15,10 +15,13 @@ import (
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
+// A list of bar chart data points
 type BarDataList = []opts.BarData
 
+// This type maps series names to their values
 type BarDataSeries = map[string]BarDataList
 
+// This function initializes the nuplot bar command.
 func NuplotBar() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{

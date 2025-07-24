@@ -17,8 +17,10 @@ import (
 	"github.com/gtnebel/nu_plugin_nuplot/commands"
 )
 
-const PluginVersion = "0.0.1"
+// The plugin version that is passed to nushell when the plugin is registered.
+const PluginVersion = "0.1.1"
 
+// global system signal handler
 func quitSignalContext() context.Context {
 	ctx, cancel := context.WithCancelCause(context.Background())
 

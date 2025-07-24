@@ -81,17 +81,42 @@ plugin add nu_plugin_nuplot; plugin use nuplot;
 
 Now, `help nuplot line` should show the help for the line chart.
 
-## TODO
+## Acknowledgments
 
-- [x] Implement chart types
-  - [x] Line chart
-  - [x] Bar chart
-  - [x] Stacked bar chart
-  - [x] Pie chart
-  - [x] Boxplot chart
-  - [x] Kline chart
-- [x] Implement main command `nuplot`
-- [x] Define a default set of flags for all chart types
-- [x] Define reasonable default features for all charts
-- [ ] Documentation
-- [ ] Packaging
+This software is using other great open source libraries:
+
+- [Nushell Plugin](https://github.com/ainvaltin/nu-plugin): A library for
+  developing Nushell plugins in Golang
+- [go-echarts](https://github.com/go-echarts/go-echarts): A charts library for
+  Golang
+- [Stats - Golang Statistics Package](https://github.com/montanaflynn/stats):
+  Golang statistics library
+- [Package browser](https://github.com/pkg/browser): Open generated chart in a
+  browser window
+
+[Additional dependencies](https://github.com/gtnebel/nu_plugin_nuplot/network/dependencies)
+
+## BSD 2-Clause License
+
+Copyright (c) 2025, Thomas Nebel
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

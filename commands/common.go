@@ -109,6 +109,7 @@ func getBoolFlag(call *nu.ExecCommand, name string) bool {
 	}
 }
 
+// Convert an int or float nushell value to float64.
 func ValueToFloat64(value nu.Value) (float64, error) {
 	switch v := value.Value.(type) {
 	case int64:
@@ -158,6 +159,8 @@ func matchXValue(nuValue nu.Value) any {
 	}
 }
 
+// Sets the debug level to [slog.LevelDebug], if the verbose flag is given on
+// the command line.
 func checkVerboseFlag(call *nu.ExecCommand) {
 	if getBoolFlag(call, flags.Verbose.Long) {
 		slog.SetLogLoggerLevel(slog.LevelDebug)

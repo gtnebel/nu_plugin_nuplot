@@ -15,10 +15,13 @@ import (
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
+// A List of line chart data points
 type LineDataList = []opts.LineData
 
+// Line data series mapping
 type LineDataSeries = map[string]LineDataList
 
+// This function initializes the nuplot line command.
 func NuplotLine() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{

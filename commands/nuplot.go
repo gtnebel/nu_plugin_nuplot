@@ -9,6 +9,8 @@ import (
 	"github.com/ainvaltin/nu-plugin/types"
 )
 
+// This function initializes the nuplot main command. This command prints
+// the help message of the nuplot plugin to stderr.
 func Nuplot() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{

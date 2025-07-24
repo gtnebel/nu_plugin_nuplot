@@ -17,10 +17,13 @@ import (
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
+// A list of kline chart data points
 type KlineDataList = []opts.KlineData
 
+// Kline data series mapping
 type KlineDataSeries = map[string]KlineDataList
 
+// This function initializes the nuplot kline command.
 func NuplotKline() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{

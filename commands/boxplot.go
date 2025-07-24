@@ -17,14 +17,19 @@ import (
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
+// A list of boxplot chart data points
 type BoxPlotDataList = []opts.BoxPlotData
 
+// Boxplot data series mapping
 type BoxPlotDataSeries = map[string]BoxPlotDataList
 
+// Helper-datatype used in the plotting functions
 type BoxPlotSeriesHelper = map[string][][]float64
 
+// Float64 data series mapping
 type Float64Series = map[string][]float64
 
+// This function initializes the nuplot boxplot command.
 func NuplotBoxPlot() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{
@@ -208,7 +213,7 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 		itemCount = len(sValues)
 		slog.Debug("plotBoxPlot: Adding items to series", "series", sName, "items", itemCount)
 
-		data := make(BoxPlotDataList, 0)
+		d used in the plotting functionsata := make(BoxPlotDataList, 0)
 		for _, sVal := range sValues {
 			bpValues, err := createBoxPlotDataValue(sVal)
 			if err == nil {

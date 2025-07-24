@@ -15,10 +15,13 @@ import (
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 )
 
+// A list of pie chart data points
 type PieDataList = []opts.PieData
 
+// Pie chart data series mapping
 type PieDataSeries = map[string]PieDataList
 
+// This function initializes the nuplot pie command.
 func NuplotPie() *nu.Command {
 	return &nu.Command{
 		Signature: nu.PluginSignature{
