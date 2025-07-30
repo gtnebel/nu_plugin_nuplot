@@ -31,12 +31,12 @@ jobs:
         run: |
           GOOS=${{ matrix.goos }} \
           GOARCH=${{ matrix.goarch }} \
-          go build -o build/${{ github.event.repository.name }}_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }}
+          go build -o build/${{ github.event.repository.name }}${{ matrix.goos == 'windows' && '.exe' || '' }}
         env:
           CGO_ENABLED: 0
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: build/   
+          name: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: build/
