@@ -57,7 +57,13 @@ http get https://bulk.meteostat.net/v2/hourly/2024/10389.csv.gz
 
 ![image](https://github.com/user-attachments/assets/760d626b-44c0-4979-88da-e20a4946a79c)
 
-## Build and install
+## Getting binaries
+
+Binaries for a range of operating systems and architectures are provided with
+each release on GitHub. Simply download the zip file for your os and
+architecture.
+
+## Build from source
 
 **Prerequisits:** You will need the Go compiler to build the project.
 
@@ -73,10 +79,16 @@ Build the project
 go build
 ```
 
-Install and use the plugin
+## Register the plugin an nushell
+
+Use the `plugin add` and `plugin use` commands to register and use the plugin.
+
+The `plugin use` command is only needed to activate the newly added plugin in
+the currently running shell.
 
 ```nu
-plugin add nu_plugin_nuplot; plugin use nuplot;
+plugin add nu_plugin_nuplot
+plugin use nuplot;
 ```
 
 Now, `help nuplot line` should show the help for the line chart.

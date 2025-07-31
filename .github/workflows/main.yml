@@ -1,11 +1,13 @@
 name: Build and deploy
 
+# Build on every push (not needed)
 # on:
 #   push:
 #     branches: [ main ]
 #   pull_request:
 #     branches: [ main ]
 
+# Build, if a tag with a version number was created
 on:
   create:
     tags:
@@ -14,6 +16,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Build for all combinations of `goos` and `goarch`
     strategy:
       matrix:
         goos: [linux, darwin, windows, freebsd]
@@ -39,6 +42,11 @@ jobs:
           go build -o build/${{ github.event.repository.name }}${{ matrix.goos == 'windows' && '.exe' || '' }}
         env:
           CGO_ENABLED: 0
+
+      - name: Copy Readme and License files
+        run: |
+          cp README.md build
+          cp LICENSE build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
