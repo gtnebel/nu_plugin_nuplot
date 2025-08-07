@@ -214,7 +214,7 @@ func handleCommandInput(call *nu.ExecCommand, plotFunc PlotHandlerFunc) error {
 // Builds the global chart options that determine the appearance of the chart.
 func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 	// set some global options like Title/Legend/ToolTip or anything else
-	title := getStringFlag(call, "title", "Chart title")
+	title := getStringFlag(call, "title", flags.Title.Default.Value.(string))
 	subtitle := getStringFlag(call, "subtitle", "This chart was rendered by nuplot.")
 	colorTheme := getStringFlag(call, "color-theme", charttypes.ThemeWesteros)
 	width := getIntFlag(call, "width", 1200)
@@ -277,6 +277,14 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 			Scale: opts.Bool(fitted),
 		}),
 	}
+}
+
+// Sets the page title for the given chart. We only have single charts and
+// don't format them on a page, so we set the chart.PageTitle shortcut
+// Field directly.
+func setPageTitle(call *nu.ExecCommand, chart *charts.BaseConfiguration) {
+	title := getStringFlag(call, "title", flags.Title.Default.Value.(string))
+	chart.PageTitle = title
 }
 
 // Helper function that wraps the creation of the temporary file the chart is

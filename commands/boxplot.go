@@ -238,5 +238,7 @@ func plotBoxPlot(input any, call *nu.ExecCommand) error {
 		boxplot = boxplot.SetXAxis(xRange)
 	}
 
+	setPageTitle(call, &boxplot.BaseConfiguration)
+
 	return renderChart(func(f *os.File) error { return boxplot.Render(f) })
 }

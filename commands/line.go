@@ -155,5 +155,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 		// }),
 	)
 
+	setPageTitle(call, &line.BaseConfiguration)
+
 	return renderChart(func(f *os.File) error { return line.Render(f) })
 }

@@ -194,10 +194,10 @@ func plotKline(input any, call *nu.ExecCommand) error {
 		return fmt.Errorf("plotKline: unsupported input value type: %T", inputValue)
 	}
 
-	// create a new line instance
-	line := charts.NewKLine()
+	// create a new kline instance
+	kline := charts.NewKLine()
 
-	line.SetGlobalOptions(buildGlobalChartOptions(call)...)
+	kline.SetGlobalOptions(buildGlobalChartOptions(call)...)
 
 	// Put data into instance
 	itemCount := 0
@@ -208,19 +208,21 @@ func plotKline(input any, call *nu.ExecCommand) error {
 
 		itemCount = len(sValues)
 		slog.Debug("plotKline: Adding items to series", "series", sName, "items", itemCount)
-		line = line.AddSeries(sName, sValues)
+		kline = kline.AddSeries(sName, sValues)
 	}
 
 	if xAxisName != XAxisSeries {
-		line = line.SetXAxis(xSeries)
+		kline = kline.SetXAxis(xSeries)
 	} else {
 		xRange := make([]int, itemCount)
 		for i := range itemCount {
 			xRange[i] = i
 		}
 
-		line = line.SetXAxis(xRange)
+		kline = kline.SetXAxis(xRange)
 	}
 
-	return renderChart(func(f *os.File) error { return line.Render(f) })
+	setPageTitle(call, &kline.BaseConfiguration)
+
+	return renderChart(func(f *os.File) error { return kline.Render(f) })
 }

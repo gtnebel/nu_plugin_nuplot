@@ -121,5 +121,7 @@ func plotPie(input any, call *nu.ExecCommand) error {
 		pie = pie.AddSeries(sName, sValues)
 	}
 
+	setPageTitle(call, &pie.BaseConfiguration)
+
 	return renderChart(func(f *os.File) error { return pie.Render(f) })
 }

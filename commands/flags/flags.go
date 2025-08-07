@@ -24,7 +24,7 @@ var (
 		Required: false,
 		Desc:     "The chart title",
 		VarId:    0,
-		Default:  &nu.Value{Value: "Chart title"},
+		Default:  &nu.Value{Value: "Nuplot Chart"},
 	}
 
 	SubTitle = nu.Flag{

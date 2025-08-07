@@ -156,5 +156,7 @@ func plotBar(input any, call *nu.ExecCommand) error {
 		)
 	}
 
+	setPageTitle(call, &bar.BaseConfiguration)
+
 	return renderChart(func(f *os.File) error { return bar.Render(f) })
 }
