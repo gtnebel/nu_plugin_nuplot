@@ -3,6 +3,10 @@
 `nuplot` is a [nushell](https://www.nushell.sh) plugin for plotting charts. It
 builds interactive charts from your data that are opened inside the web browser.
 
+```shell
+go install github.com/gtnebel/nu_plugin_nuplot@latest
+```
+
 ## Features
 
 - Supported chart types:
