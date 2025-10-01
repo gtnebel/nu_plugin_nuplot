@@ -67,6 +67,14 @@ Binaries for a range of operating systems and architectures are provided with
 each release on GitHub. Simply download the zip file for your os and
 architecture.
 
+## Install with `go install`
+
+The binary is installed to `$GOPATH/bin` (`~/go/bin`)
+
+```shell
+go install github.com/gtnebel/nu_plugin_nuplot@latest
+```
+
 ## Build from source
 
 **Prerequisits:** You will need the Go compiler to build the project.
@@ -90,9 +98,13 @@ Use the `plugin add` and `plugin use` commands to register and use the plugin.
 The `plugin use` command is only needed to activate the newly added plugin in
 the currently running shell.
 
+**IMPORTANT:** The path to `nu_plugin_nuplot` has to be in `$PATH` if you run 
+the code below. If you installed the plugin using `go install`, add `~/go/bin`
+to your `$PATH`.
+
 ```nu
-plugin add nu_plugin_nuplot
-plugin use nuplot;
+plugin add (which nu_plugin_nuplot | get 0.path)
+plugin use nuplot
 ```
 
 Now, `help nuplot line` should show the help for the line chart.
