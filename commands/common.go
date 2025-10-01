@@ -9,6 +9,7 @@ import (
 	"os"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
@@ -54,6 +55,29 @@ func getSeries[SeriesType ChartData](series map[string][]SeriesType, name string
 		series[name] = make([]SeriesType, 0)
 		return series[name]
 	}
+}
+
+// Tries to find a column that is likely to be used as x-axis and returns it.
+func autoSetXaxis(rec nu.Record, xAxisName string) string {
+	// TODO: Find more column names for the x axis
+	xAxisNames := []string{
+		"timestamp", "ts", "date", "time", "datetime", "nr", "id",
+	}
+
+	if xAxisName != XAxisSeries {
+		slog.Debug("autoSetXaxis: using user-provided x-axis name")
+		return xAxisName
+	} else {
+		for k, _ := range rec {
+			if slices.Contains(xAxisNames, strings.ToLower(k)) {
+				slog.Debug("autoSetXaxis: using column of table as x-axis", "column", k)
+				return k
+			}
+		}
+	}
+
+	slog.Debug("autoSetXaxis: no suitable column found")
+	return xAxisName
 }
 
 // Retrieve the string value of a flag from the call. The name of the flag and

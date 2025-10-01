@@ -106,7 +106,7 @@ func buildKlineDataValue(data []float64) opts.KlineData {
 func klineReadInputListItem(listItem []nu.Value, klineSeries KlineDataSeries, xAxisName string) (xValue any, res error) {
 	series := make(Float64Series)
 
-	for _, item := range listItem {
+	for itemIndex, item := range listItem {
 		switch itemValue := item.Value.(type) {
 		case int64:
 			// items := getSeries(seriesHelper, DefaultSeries)
@@ -117,6 +117,11 @@ func klineReadInputListItem(listItem []nu.Value, klineSeries KlineDataSeries, xA
 			items := getSeries(series, DefaultSeries)
 			series[DefaultSeries] = append(items, itemValue)
 		case nu.Record:
+			// Try to set xAxisName to one of the columns in the record.
+			if itemIndex == 0 {
+				xAxisName = autoSetXaxis(itemValue, xAxisName)
+			}
+
 			for k, v := range itemValue {
 				if k == xAxisName {
 					continue

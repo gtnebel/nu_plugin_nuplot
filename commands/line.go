@@ -72,7 +72,7 @@ func plotLine(input any, call *nu.ExecCommand) error {
 
 	switch inputValue := input.(type) {
 	case []nu.Value:
-		for _, item := range inputValue {
+		for itemIndex, item := range inputValue {
 			switch itemValue := item.Value.(type) {
 			case int64:
 				items := getSeries(series, DefaultSeries)
@@ -81,6 +81,11 @@ func plotLine(input any, call *nu.ExecCommand) error {
 				items := getSeries(series, DefaultSeries)
 				series[DefaultSeries] = append(items, opts.LineData{Value: itemValue})
 			case nu.Record:
+				// Try to set xAxisName to one of the columns in the record.
+				if itemIndex == 0 {
+					xAxisName = autoSetXaxis(itemValue, xAxisName)
+				}
+
 				for k, v := range itemValue {
 					if k == xAxisName {
 						continue
