@@ -106,6 +106,7 @@ func plotBar(input any, call *nu.ExecCommand) error {
 						items := getSeries(series, xAxisName)
 						series[xAxisName] = append(items, opts.BarData{Value: matchXValue(v)})
 					} else {
+						slog.Warn("Specified x-axis is not continuous. Reseting x-axis to default value.")
 						// If the column specified in --xaxis does not exist, we
 						// set the `xAxisName` variable to XAxisSeries, so that a
 						// simple int range is generated as x axis.

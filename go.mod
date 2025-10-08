@@ -7,6 +7,7 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.6.2
 	github.com/montanaflynn/stats v0.7.1
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
+	github.com/relvacode/iso8601 v1.7.0
 )
 
 require (

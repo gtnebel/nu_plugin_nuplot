@@ -15,6 +15,8 @@ import (
 	"github.com/gtnebel/nu_plugin_nuplot/commands/flags"
 	"github.com/pkg/browser"
 
+	"github.com/relvacode/iso8601"
+
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	charttypes "github.com/go-echarts/go-echarts/v2/types"
@@ -155,6 +157,10 @@ func matchXValue(nuValue nu.Value) any {
 
 	switch value := nuValue.Value.(type) {
 	case string:
+		if date, err := iso8601.ParseString(value); err == nil {
+			// slog.Debug("matchXValue: Value is ISO8601 date string")
+			return date
+		}
 		if date, err := time.Parse(time.RFC3339, value); err == nil {
 			// slog.Debug("matchXValue: Value is RFC3339 date string")
 			return date
