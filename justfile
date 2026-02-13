@@ -9,7 +9,7 @@ gmt:
     go mod tidy
 
 # Update all project dependencies
-update:
+update: && gmt
     go get -u ./...
 
 # Remove the nuplot plugin from nushell
