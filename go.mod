@@ -16,4 +16,4 @@ require (
 	golang.org/x/sys v0.36.0 // indirect
 )
 
-// replace github.com/ainvaltin/nu-plugin => github.com/gtnebel/nu-plugin v0.0.0-20250407192509-e6873fbd00e8
+replace github.com/ainvaltin/nu-plugin => github.com/gtnebel/nu-plugin v0.0.0-20260213094314-1e10fe1ea48d

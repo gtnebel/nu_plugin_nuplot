@@ -1,11 +1,11 @@
-github.com/ainvaltin/nu-plugin v0.0.0-20250907111918-1d43779b9a0f h1:Qm5fVPl8tdY7cMr7IMEYYPMmMLn8yt8i3Y15/CyxS3Q=
-github.com/ainvaltin/nu-plugin v0.0.0-20250907111918-1d43779b9a0f/go.mod h1:NEtYqVsWMTMGRsQRXlxnFtv+NEnA4ZiODGzwKS/D+lg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-echarts/go-echarts/v2 v2.6.2 h1:IDZHYbPOBhx3t/vewppVXtvSWkcpAieEXBvd9tgYUa0=
 github.com/go-echarts/go-echarts/v2 v2.6.2/go.mod h1:Z+spPygZRIEyqod69r0WMnkN5RV3MwhYDtw601w3G8w=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
+github.com/gtnebel/nu-plugin v0.0.0-20260213094314-1e10fe1ea48d h1:dtlPVsw/9jFVOOS5QIkKzUNlG45tCN1OgYEqW/wpSAg=
+github.com/gtnebel/nu-plugin v0.0.0-20260213094314-1e10fe1ea48d/go.mod h1:NEtYqVsWMTMGRsQRXlxnFtv+NEnA4ZiODGzwKS/D+lg=
 github.com/montanaflynn/stats v0.7.1 h1:etflOAAHORrCC44V+aR6Ftzort912ZU+YLiSTuV8eaE=
 github.com/montanaflynn/stats v0.7.1/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
 github.com/neilotoole/slogt v1.1.0 h1:c7qE92sq+V0yvCuaxph+RQ2jOKL61c4hqS1Bv9W7FZE=

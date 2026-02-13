@@ -7,6 +7,20 @@ builds interactive charts from your data that are opened inside the web browser.
 go install github.com/gtnebel/nu_plugin_nuplot@latest
 ```
 
+## Compatibility matrix
+
+Nushell plugins always have to be built for a specific nushell version. This
+table shows which `nuplot` releases are compatible to which `nushell` version.
+
+| nuplot version                                                           | nushell version |
+| ------------------------------------------------------------------------ | --------------- |
+| [0.1.0](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.1.0) | 0.104.0         |
+| [0.1.1](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.1.1) | 0.105.0         |
+| [0.1.2](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.1.2) | 0.106.0         |
+| [0.1.3](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.1.3) | 0.107.0         |
+| [0.2.0](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.2.0) | 0.107.0         |
+| [0.2.1](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.2.1) | 0.108.0         |
+
 ## Features
 
 - Supported chart types:
@@ -98,7 +112,7 @@ Use the `plugin add` and `plugin use` commands to register and use the plugin.
 The `plugin use` command is only needed to activate the newly added plugin in
 the currently running shell.
 
-**IMPORTANT:** The path to `nu_plugin_nuplot` has to be in `$PATH` if you run 
+**IMPORTANT:** The path to `nu_plugin_nuplot` has to be in `$PATH` if you run
 the code below. If you installed the plugin using `go install`, add `~/go/bin`
 to your `$PATH`.
 
