@@ -27,7 +27,9 @@ rename-artifacts path nu_version:
     ls -f {{ path }} \
     | where name like 'nu_plugin_nuplot-' \
     | each {|f| \
-        let p = $f.name | path parse; \
-        let new_name = ($p.stem | str replace 'darwin' 'macos') + "-nushell_{{ nu_version }}"; \
-        mv $f.name ({ parent: $p.parent stem: $new_name extension: $p.extension} | path join) \
+        if $f.name !~ "nushell" { \
+            let p = $f.name | path parse; \
+            let new_name = ($p.stem | str replace 'darwin' 'macos') + "-nushell_{{ nu_version }}"; \
+            mv $f.name ({ parent: $p.parent stem: $new_name extension: $p.extension} | path join) \
+        } \
     }
