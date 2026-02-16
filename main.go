@@ -18,7 +18,7 @@ import (
 )
 
 // The plugin version that is passed to nushell when the plugin is registered.
-const PluginVersion = "0.2.1"
+const PluginVersion = "0.2.2"
 
 // global system signal handler
 func quitSignalContext() context.Context {
