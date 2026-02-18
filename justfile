@@ -8,9 +8,17 @@ build:
 gmt:
     go mod tidy
 
+# Call go fix to apply code optimizations
+fix:
+    go fix ./...
+
 # Update all project dependencies
 update: && gmt
     go get -u ./...
+
+# Update the required go version in go.mod file
+update_go:
+    go get go@latest
 
 # Remove the nuplot plugin from nushell
 [private]
