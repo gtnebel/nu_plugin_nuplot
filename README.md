@@ -48,7 +48,7 @@ table shows which `nuplot` releases are compatible to which `nushell` version.
 #### Show weather forcast from wttr.in as bar chart
 
 ```nushell
-http get http://wttr.in?format=j1
+http get http://wttr.in/Berlin?format=j1
 | get weather
 | select date avgtempC
 | each {|l| {date: ($l.date | into datetime) avgtempC: ($l.avgtempC | into int)} }
