@@ -1,5 +1,5 @@
-github.com/ainvaltin/nu-plugin v0.0.0-20260215170319-8126ad8b460d h1:aKC23F4y7gt5pUGHtWQ91YwDCdnDqt7k9QpG2p1DM4g=
-github.com/ainvaltin/nu-plugin v0.0.0-20260215170319-8126ad8b460d/go.mod h1:NEtYqVsWMTMGRsQRXlxnFtv+NEnA4ZiODGzwKS/D+lg=
+github.com/ainvaltin/nu-plugin v0.0.0-20260222094015-da2ad53b9c9e h1:Khcq2DxrHQ1/flJcsIYAEkkNdSbIhkNMm40RbPg/CEw=
+github.com/ainvaltin/nu-plugin v0.0.0-20260222094015-da2ad53b9c9e/go.mod h1:NEtYqVsWMTMGRsQRXlxnFtv+NEnA4ZiODGzwKS/D+lg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-echarts/go-echarts/v2 v2.6.7 h1:J9Y6/vVn06BBSGeoowPbdUWsxzHktwqF1uwOuSEUyTY=
