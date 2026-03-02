@@ -3,8 +3,8 @@ module github.com/gtnebel/nu_plugin_nuplot
 go 1.24.0
 
 require (
-	github.com/ainvaltin/nu-plugin v0.0.0-20260222094015-da2ad53b9c9e
-	github.com/go-echarts/go-echarts/v2 v2.6.7
+	github.com/ainvaltin/nu-plugin v0.0.0-20260301103531-c068ae10068b
+	github.com/go-echarts/go-echarts/v2 v2.7.0
 	github.com/montanaflynn/stats v0.7.1
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/relvacode/iso8601 v1.7.0
