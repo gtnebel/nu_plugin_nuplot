@@ -1,6 +1,6 @@
 module github.com/gtnebel/nu_plugin_nuplot
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/ainvaltin/nu-plugin v0.0.0-20260308193923-65e531940c9e
