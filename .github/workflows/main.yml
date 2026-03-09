@@ -9,9 +9,14 @@ name: Build and deploy
 
 # Build, if a tag with a version number was created
 on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*.*.*'
   create:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   build:
