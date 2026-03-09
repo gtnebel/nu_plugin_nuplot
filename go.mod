@@ -3,7 +3,7 @@ module github.com/gtnebel/nu_plugin_nuplot
 go 1.24.0
 
 require (
-	github.com/ainvaltin/nu-plugin v0.0.0-20260301103531-c068ae10068b
+	github.com/ainvaltin/nu-plugin v0.0.0-20260308193923-65e531940c9e
 	github.com/go-echarts/go-echarts/v2 v2.7.0
 	github.com/montanaflynn/stats v0.7.1
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
@@ -13,7 +13,8 @@ require (
 require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 )
 
-//replace github.com/ainvaltin/nu-plugin => github.com/gtnebel/nu-plugin v0.0.0-20260220134143-4a2d0613d3c1
+// replace github.com/ainvaltin/nu-plugin => github.com/gtnebel/nu-plugin v0.0.0-20260220134143-4a2d0613d3c1
+// replace github.com/ainvaltin/nu-plugin => ../nu-plugin

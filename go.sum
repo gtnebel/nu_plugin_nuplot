@@ -1,5 +1,5 @@
-github.com/ainvaltin/nu-plugin v0.0.0-20260301103531-c068ae10068b h1:GwQtGpAoW7RQM171OzQOIY0JzeC7FFT/+tIsreVHee4=
-github.com/ainvaltin/nu-plugin v0.0.0-20260301103531-c068ae10068b/go.mod h1:NEtYqVsWMTMGRsQRXlxnFtv+NEnA4ZiODGzwKS/D+lg=
+github.com/ainvaltin/nu-plugin v0.0.0-20260308193923-65e531940c9e h1:MKQ89ZGBRlyxTZEElQpE2AmmVTubu/YpFzTOs5Yn4MU=
+github.com/ainvaltin/nu-plugin v0.0.0-20260308193923-65e531940c9e/go.mod h1:NEtYqVsWMTMGRsQRXlxnFtv+NEnA4ZiODGzwKS/D+lg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-echarts/go-echarts/v2 v2.7.0 h1:PQqs3jpTEroMKgxEALPKBNFTO2Ms9By11gVOKh8+stI=
@@ -23,7 +23,7 @@ github.com/vmihailenco/msgpack/v5 v5.4.1/go.mod h1:GaZTsDaehaPpQVyxrf5mtQlH+pc21
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
 golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.41.0 h1:Ivj+2Cp/ylzLiEU89QhWblYnOE9zerudt9Ftecq2C6k=
-golang.org/x/sys v0.41.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
+golang.org/x/sys v0.42.0 h1:omrd2nAlyT5ESRdCLYdm3+fMfNFE/+Rf4bDIQImRJeo=
+golang.org/x/sys v0.42.0/go.mod h1:4GL1E5IUh+htKOUEOaiffhrAeqysfVGipDYzABqnCmw=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
