@@ -25,6 +25,7 @@ table shows which `nuplot` releases are compatible to which `nushell` version.
 | [0.2.4](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.2.4) | 0.110.0         |
 | [0.2.5](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.2.5) | 0.111.0         |
 | [0.2.6](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.2.6) | 0.113.0         |
+| [0.2.7](https://github.com/gtnebel/nu_plugin_nuplot/releases/tag/v0.2.7) | 0.114.0         |
 
 ## Features
 

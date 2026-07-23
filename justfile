@@ -1,5 +1,9 @@
 set shell := ['nu', '-c']
 
+# List all targets
+help:
+    @just -l
+
 # Build the plugin
 build:
     go build
