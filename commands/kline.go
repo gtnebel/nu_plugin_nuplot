@@ -182,7 +182,9 @@ func plotKline(input any, call *nu.ExecCommand) error {
 	series := make(KlineDataSeries)
 	var xSeries []any = nil
 
-	xAxisName := getCellPathFlag(call, "xaxis", XAxisSeries)
+	// TODO: When the cell path parsing bug is fixed, this flag can be made to
+	// a cell path again.
+	xAxisName := getStringFlag(call, "xaxis", XAxisSeries)
 	slog.Debug("plotKline", "xAxisName", xAxisName)
 
 	switch inputValue := input.(type) {

@@ -70,7 +70,7 @@ func autoSetXaxis(rec nu.Record, xAxisName string) string {
 		slog.Debug("autoSetXaxis: using user-provided x-axis name")
 		return xAxisName
 	} else {
-		for k, _ := range rec {
+		for k := range rec {
 			if slices.Contains(xAxisNames, strings.ToLower(k)) {
 				slog.Debug("autoSetXaxis: using column of table as x-axis", "column", k)
 				return k
@@ -282,20 +282,22 @@ func buildGlobalChartOptions(call *nu.ExecCommand) []charts.GlobalOpts {
 			},
 		}),
 		// charts.WithLegendOpts(opts.Legend{Right: "80%"}),
-		charts.WithToolboxOpts(opts.Toolbox{
-			// Right: "5%",
-			Feature: &opts.ToolBoxFeature{
-				SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{
-					Type:  "jpg",
-					Title: "Download as jpg",
+		charts.WithToolboxOpts(
+			opts.Toolbox{
+				// Right: "5%",
+				Feature: &opts.ToolBoxFeature{
+					SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{
+						Type:  "jpg",
+						Title: "Download as jpg",
+					},
+					// DataView: &opts.ToolBoxFeatureDataView{
+					// 	Title: "DataView",
+					// 	// set the language
+					// 	// Chinese version: ["数据视图", "关闭", "刷新"]
+					// 	Lang: []string{"data view", "turn off", "refresh"},
+					// },
 				},
-				// DataView: &opts.ToolBoxFeatureDataView{
-				// 	Title: "DataView",
-				// 	// set the language
-				// 	// Chinese version: ["数据视图", "关闭", "刷新"]
-				// 	Lang: []string{"data view", "turn off", "refresh"},
-				// },
-			}},
+			},
 		),
 		charts.WithDataZoomOpts(opts.DataZoom{
 			Type: "slider",

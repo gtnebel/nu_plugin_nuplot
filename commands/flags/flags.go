@@ -68,9 +68,11 @@ var (
 	}
 
 	XAxis = nu.Flag{
-		Long:     "xaxis",
-		Short:    'x',
-		Shape:    syntaxshape.CellPath(),
+		Long:  "xaxis",
+		Short: 'x',
+		// TODO: When the cell path parsing bug is fixed, this flag can be made to
+		// a cell path again.
+		Shape:    syntaxshape.String(), // syntaxshape.CellPath(),
 		Required: false,
 		Desc:     "Only if input is a table: the column name wich holds the values for the x-axis",
 		VarId:    0,
